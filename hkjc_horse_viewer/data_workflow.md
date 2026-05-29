@@ -21,19 +21,39 @@ The scraper already uses Playwright to handle the SPA. We wrap it in a scheduled
 ## Decision 2 — Where to Store Historical Data
 
 ### Current state
-82 individual CSV files in `hkjc_scraper/data/`, ~10,000 rows total.
+82 individual CSV files in `hkjc_scraper/data/`, ~10,000 rows total (~120 rows added per race day).
+
+### Do we need a cloud database or a local database?
+
+**Short answer: No — not at this scale.**
+
+| Storage option | Suitable? | Reason |
+|----------------|-----------|--------|
+| ☁️ Cloud DB (Firebase, Supabase, PlanetScale…) | ❌ Overkill | Requires a backend API, authentication, ongoing cost, and server infrastructure. This is a static GitHub Pages site with no backend. |
+| 🗄️ SQLite `.db` file | ❌ Adds complexity | Can only be queried in the browser via a ~1 MB WebAssembly library (sql.js). Adds a heavy dependency for zero benefit at this row count. |
+| **📄 Single merged CSV** ✅ | **Yes** | ~10,000 rows is tiny. JavaScript loads it once, parses it into an in-memory array in < 100 ms, and all filtering/aggregation runs in < 5 ms per query using standard `Array.filter()` / `Array.reduce()`. No library, no backend, no cost. |
+
+A database becomes worthwhile only when data grows past ~500,000 rows or when you need server-side filtering to reduce payload size. At ~120 rows per race day, that threshold is many years away.
+
+### How does the webpage do analysis without a database?
+
+After the CSV is fetched once, JavaScript parses it into two in-memory lookup maps (see §5). All subsequent analytics queries are plain array operations on those maps — **no network calls, no query language needed**.
+
+| Analysis needed | JS operation | Time on 10,000 rows |
+|-----------------|-------------|---------------------|
+| All races for horse K289 | `horsemap["K289"]` — O(1) lookup | < 1 ms |
+| Running position classification | `count` front/mid/back in array | < 1 ms |
+| Jockey–horse record | `pairmap["K289+潘頓"]` — O(1) lookup | < 1 ms |
 
 ### Options considered
 
-| Option | Description | Problem |
-|--------|-------------|---------|
-| A — Fetch each CSV individually | Viewer calls GitHub Contents API, then fetches each file one by one | 82+ HTTP requests on every page load. Slow, wasteful, and GitHub may rate-limit. |
-| B — SQLite file in repo | Merge all data into a `.db` file | Cannot be queried directly in the browser without a WASM SQLite library. Adds complexity. |
-| **C — Single merged CSV** ✅ | A `merge_csv.py` script rebuilds `data/all_results.csv` after every scrape. Viewer fetches this one file. | File grows over time, but at the current rate (~120 rows/race day) it will stay well under 5 MB for a full season. |
+| Option | Description | Why rejected / chosen |
+|--------|-------------|----------------------|
+| A — Fetch each CSV individually | Viewer calls GitHub Contents API, then fetches each file one by one | 82+ HTTP requests on every page load. Slow, wasteful, GitHub may rate-limit. ❌ |
+| B — Cloud / SQLite database | Store all rows in a queryable database | Requires backend or WASM library. Overkill for 10,000 rows. ❌ |
+| **C — Single merged CSV** ✅ | `merge_csv.py` rebuilds `data/all_results.csv` after every scrape. Viewer fetches this one file. | 1 HTTP request, zero dependencies, fast in-browser parsing. ✅ |
 
-**Decision: Option C — single merged `all_results.csv`.**
-
-One HTTP request, no dependencies, trivially parsed with standard JS. The GitHub Actions workflow rebuilds it after each new race day is scraped.
+**Decision: Option C — single merged `all_results.csv`, analysed in-memory by the browser.**
 
 ---
 
