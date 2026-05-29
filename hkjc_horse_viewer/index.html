@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HKJC 賽馬分析 | 下場預測工具</title>
+  <style>
+    :root {
+      --blue:      #003F88;
+      --blue-lt:   #0055B3;
+      --bg:        #F0F2F5;
+      --white:     #FFFFFF;
+      --border:    #E0E0E0;
+      --t1:        #111111;
+      --t2:        #555555;
+      --t3:        #888888;
+      --gold:      #C8960C;
+      --silver:    #9CA3AF;
+      --bronze:    #A0522D;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, 'Noto Sans TC', BlinkMacSystemFont,
+                   'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--t1);
+    }
+
+    /* ── Header ── */
+    .hdr {
+      background: var(--blue);
+      color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: sticky; top: 0; z-index: 200;
+      box-shadow: 0 2px 8px rgba(0,0,0,.35);
+    }
+    .hdr-icon  { font-size: 26px; }
+    .hdr-title { font-size: 17px; font-weight: 700; letter-spacing: .4px; }
+    .hdr-sub   { font-size: 11px; opacity: .7; margin-top: 1px; }
+    .hdr-race-day {
+      margin-left: 12px; font-size: 12px;
+      background: rgba(255,255,255,.18);
+      padding: 3px 10px; border-radius: 12px;
+    }
+
+    /* ── Loading overlay ── */
+    .loading-overlay {
+      position: fixed; inset: 0;
+      background: rgba(255,255,255,.85);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 14px; z-index: 999;
+    }
+    .loading-overlay.hidden { display: none; }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 4px solid #E5E7EB;
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-txt { font-size: 14px; color: var(--t2); }
+
+    /* ── Error / no-race state ── */
+    .fullstate {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      height: calc(100vh - 50px);
+      gap: 10px; color: var(--t3); text-align: center; padding: 20px;
+    }
+    .fullstate .fi  { font-size: 48px; }
+    .fullstate .ft  { font-size: 16px; font-weight: 600; color: var(--t2); }
+    .fullstate .fs  { font-size: 13px; }
+    .fullstate .retry-btn {
+      margin-top: 8px;
+      padding: 8px 20px;
+      background: var(--blue); color: #fff;
+      border: none; border-radius: 6px;
+      font-size: 13px; cursor: pointer;
+    }
+    .fullstate .retry-btn:hover { background: var(--blue-lt); }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      height: calc(100vh - 50px);
+    }
+
+    /* ── Race list panel ── */
+    .race-panel {
+      width: 300px; min-width: 260px;
+      background: var(--white);
+      overflow-y: auto;
+      border-right: 2px solid var(--border);
+      flex-shrink: 0;
+    }
+    .panel-hdr {
+      padding: 10px 14px;
+      background: #F8F8F8;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .panel-hdr-title {
+      font-size: 12px; font-weight: 600;
+      color: var(--blue); text-transform: uppercase;
+      letter-spacing: .5px; margin-bottom: 4px;
+    }
+    .panel-hdr-date {
+      font-size: 14px; font-weight: 700; color: var(--t1);
+      margin-bottom: 4px;
+    }
+    .panel-hdr-badge {
+      display: inline-block;
+      background: #E8F5E9; color: #1B5E20;
+      font-size: 11px; font-weight: 700;
+      padding: 2px 7px; border-radius: 10px;
+    }
+
+    /* Race item */
+    .race-item {
+      display: flex; align-items: flex-start;
+      padding: 13px 14px;
+      border-bottom: 1px solid #F0F0F0;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: background .12s;
+    }
+    .race-item:hover  { background: #F0F4FF; }
+    .race-item.active { background: #E8EFFF; border-left-color: var(--blue); }
+    .race-num {
+      width: 42px; height: 42px;
+      background: #E5E7EB; color: #444;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 19px; font-weight: 700;
+      flex-shrink: 0; margin-right: 12px; margin-top: 2px;
+      transition: background .12s, color .12s;
+    }
+    .race-item.active .race-num { background: var(--blue); color: #fff; }
+    .race-info { flex: 1; min-width: 0; }
+    .race-meta { font-size: 11px; color: var(--t3); margin-bottom: 2px; }
+    .race-dist { font-size: 21px; font-weight: 700; line-height: 1.2; }
+    .race-going { font-size: 12px; color: var(--t2); margin-top: 3px; }
+    .race-chevron { align-self: center; color: #CCC; font-size: 16px; margin-left: 6px; }
+
+    /* ── Detail panel ── */
+    .detail-panel {
+      flex: 1; overflow-y: auto;
+      background: var(--bg); min-width: 0;
+    }
+    .empty-state {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      height: 55%; gap: 8px;
+      color: #BBB; text-align: center;
+    }
+    .empty-state .ei   { font-size: 48px; }
+    .empty-state .etxt { font-size: 16px; }
+    .empty-state .esub { font-size: 12px; color: #CCC; }
+
+    /* Race detail header */
+    .detail-hdr {
+      background: var(--white);
+      padding: 13px 16px;
+      border-bottom: 2px solid var(--blue);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .detail-label { font-size: 11px; color: var(--t3); margin-bottom: 2px; }
+    .detail-title {
+      font-size: 17px; font-weight: 700; color: var(--blue);
+      margin-bottom: 4px;
+    }
+    .detail-meta { font-size: 13px; color: var(--t2); }
+
+    /* Card legend row */
+    .card-legend {
+      display: flex; align-items: flex-start;
+      padding: 5px 16px 7px;
+      background: #FAFAFA; border-bottom: 1px solid var(--border);
+    }
+    .cl-left  { flex: 1; font-size: 10px; font-weight: 700; color: var(--t3);
+                text-transform: uppercase; letter-spacing: .4px; padding-top: 4px; }
+    .cl-right { display: flex; flex-direction: column; gap: 3px;
+                min-width: 155px; align-items: flex-end; }
+    .cl-right span { font-size: 9px; color: var(--t3); font-weight: 600; letter-spacing: .3px; }
+
+    /* ── Horse card ── */
+    .horse-card {
+      display: flex; align-items: center;
+      background: var(--white);
+      margin: 5px 8px;
+      border-radius: 8px;
+      padding: 11px 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.07);
+      border-left: 4px solid #E5E7EB;
+      transition: box-shadow .12s;
+    }
+    .horse-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.12); }
+
+    .horse-num {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      font-size: 15px; font-weight: 700; color: var(--t2);
+      width: 44px; flex-shrink: 0; margin-right: 10px;
+    }
+    .silk-wrap {
+      width: 38px; height: 38px; overflow: hidden;
+      border-radius: 4px; border: 1px solid #E0E0E0;
+      background: #F8F8F8;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .silk-img  { width: 38px; height: auto; display: block; }
+    .horse-gate {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      width: 44px; flex-shrink: 0; margin: 0 12px;
+    }
+    .hg-num { font-size: 22px; font-weight: 800; color: var(--blue); line-height: 1; }
+    .horse-rec {
+      display: flex; align-items: center; justify-content: center;
+      width: 60px; flex-shrink: 0; margin: 0 8px;
+    }
+    .cl-rec {
+      font-size: 10px; font-weight: 700; color: var(--t3);
+      text-transform: uppercase; letter-spacing: .4px;
+      width: 60px; margin: 0 8px; flex-shrink: 0;
+      text-align: center; padding-top: 4px;
+    }
+    .horse-trj {
+      display: flex; align-items: center; justify-content: center;
+      width: 64px; flex-shrink: 0; margin: 0 8px;
+    }
+    .cl-trj {
+      font-size: 10px; font-weight: 700; color: var(--t3);
+      text-transform: uppercase; letter-spacing: .4px;
+      width: 64px; margin: 0 8px; flex-shrink: 0;
+      text-align: center; padding-top: 4px;
+    }
+    .cl-gate {
+      font-size: 10px; font-weight: 700; color: var(--t3);
+      text-transform: uppercase; letter-spacing: .4px;
+      width: 44px; margin: 0 12px; flex-shrink: 0;
+      text-align: center; padding-top: 4px;
+    }
+    .horse-left  { flex: 1; min-width: 0; }
+    .h-name {
+      font-size: 19px; font-weight: 700; color: var(--t1);
+      margin-bottom: 4px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .h-jockey  { font-size: 13px; color: var(--t2); margin-bottom: 2px; }
+    .h-trainer { font-size: 12px; color: var(--t3); }
+    .h-label   { font-size: 11px; color: var(--t3); margin-right: 4px; }
+
+    .horse-right {
+      display: flex; flex-direction: column;
+      align-items: flex-end; gap: 5px;
+      margin-left: 12px; flex-shrink: 0; min-width: 155px;
+    }
+    .hr-row1 { display: flex; align-items: center; gap: 8px; }
+    .hr-row2 { display: flex; justify-content: flex-end; }
+    .hr-row3 { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+    .form-chips { display: inline-flex; gap: 3px; align-items: center; }
+    .fchip {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 22px; height: 22px; padding: 0 4px;
+      border-radius: 11px; font-size: 11px; font-weight: 700;
+    }
+    .fc-1    { background: var(--gold);   color: #fff; }
+    .fc-top  { background: var(--silver); color: #fff; }
+    .fc-mid  { background: #D1FAE5; color: #065F46; }
+    .fc-tail { background: #F3F4F6; color: #6B7280; }
+    .fc-pu   { background: #FEE2E2; color: #991B1B; }
+    .no-form { font-size: 13px; color: #CBD5E1; }
+    .weight-val  { font-size: 14px; font-weight: 600; white-space: nowrap; }
+    .weight-unit { font-size: 11px; color: var(--t3); }
+    .badge {
+      display: inline-flex; align-items: center;
+      font-size: 11px; font-weight: 700;
+      padding: 3px 8px; border-radius: 12px;
+      white-space: nowrap; line-height: 1.4;
+    }
+    .rec-win { background: #FEE2E2; color: #991B1B; }
+    .rec-nw  { background: #EFF6FF; color: #1E40AF; }
+    .rec-1st { background: #F0FDF4; color: #14532D; }
+    .tri-row { display: inline-flex; gap: 3px; align-items: center; }
+    .tri     { font-size: 15px; color: #CBD5E1; line-height: 1; }
+    .tri-on  { color: #16A34A; }
+    .trj-h   { background: #FFF7ED; color: #9A3412; }
+    .trj-m   { background: #F0FDF4; color: #14532D; }
+    .trj-l   { background: #F1F5F9; color: #475569; }
+
+    /* ── Prediction box ── */
+    .pred-box {
+      background: linear-gradient(135deg, #EEF2FF, #fff);
+      border-radius: 10px; margin: 8px;
+      padding: 12px 14px; border: 1.5px solid #C7D2FE;
+    }
+    .pred-title  { font-size: 13px; font-weight: 700; color: var(--blue); margin-bottom: 8px; }
+    .pred-grid   { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+    .pred-slot   {
+      padding: 9px 10px; background: #fff;
+      border-radius: 7px; border: 1px solid #E0E8FF;
+      box-shadow: 0 1px 3px rgba(0,63,136,.07);
+    }
+    .pred-rank   { font-size: 12px; margin-bottom: 3px; }
+    .pred-horse  {
+      font-size: 12px; font-weight: 700; color: var(--blue);
+      margin-bottom: 6px; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    .pred-bar-wrap { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .pred-bar-bg   { flex: 1; height: 7px; background: #E5E7EB; border-radius: 4px; overflow: hidden; }
+    .pred-bar      { height: 100%; border-radius: 4px; }
+    .pred-s1 .pred-bar { background: var(--gold); }
+    .pred-s2 .pred-bar { background: var(--silver); }
+    .pred-s3 .pred-bar { background: var(--bronze); }
+    .pred-s4 .pred-bar { background: #6B7280; }
+    .pred-pct    { font-size: 11px; font-weight: 700; min-width: 28px; text-align: right; }
+    .pred-s1 .pred-pct { color: #92660C; }
+    .pred-s2 .pred-pct { color: #6B7280; }
+    .pred-s3 .pred-pct { color: var(--bronze); }
+    .pred-s4 .pred-pct { color: #6B7280; }
+    .pred-reason { font-size: 10px; color: var(--t3); line-height: 1.4; }
+
+    /* ── Responsive ── */
+    @media (max-width: 680px) {
+      .layout { flex-direction: column; height: auto; }
+      .race-panel {
+        width: 100%; border-right: none;
+        border-bottom: 2px solid var(--border);
+        max-height: 44vh;
+      }
+      .detail-panel { min-height: 50vh; }
+      .horse-card   { margin: 4px; }
+      .h-name       { font-size: 17px; }
+      .pred-grid    { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Loading overlay ────────────────────────────── -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-txt">載入賽事資料中…</div>
+</div>
+
+<!-- ── Header ─────────────────────────────────────── -->
+<header class="hdr">
+  <span class="hdr-icon">🏇</span>
+  <div>
+    <div class="hdr-title">HKJC 賽馬分析</div>
+    <div class="hdr-sub">下場預測 · 馬匹分析工具</div>
+  </div>
+  <span class="hdr-race-day" id="hdrDate">—</span>
+</header>
+
+<!-- ── Full-page state (no race / error) ──────────── -->
+<div class="fullstate hidden" id="fullstate">
+  <div class="fi" id="fullstateIcon">📅</div>
+  <div class="ft" id="fullstateTitle">今日沒有本地賽事</div>
+  <div class="fs" id="fullstateMsg">請於下個賽事日再開啟此頁面。</div>
+  <button class="retry-btn hidden" id="retryBtn" onclick="loadData()">重試</button>
+</div>
+
+<!-- ── Main Layout ────────────────────────────────── -->
+<div class="layout hidden" id="mainLayout">
+
+  <!-- Left: Race list -->
+  <nav class="race-panel" id="racePanel">
+    <div class="panel-hdr">
+      <div class="panel-hdr-title">本地賽事 · 下場分析</div>
+      <div class="panel-hdr-date" id="panelDate">—</div>
+      <div class="panel-hdr-badge">今日賽事</div>
+    </div>
+    <div id="raceList"></div>
+  </nav>
+
+  <!-- Right: Detail -->
+  <main class="detail-panel" id="detailPanel">
+    <div class="empty-state" id="emptyState">
+      <div class="ei">🏇</div>
+      <div class="etxt">選擇左方場次</div>
+      <div class="esub">查看馬匹分析及預測</div>
+    </div>
+    <div id="detailContent" hidden></div>
+  </main>
+
+</div><!-- /layout -->
+
+<script>
+'use strict';
+
+/* ── Config ──────────────────────────────────────── */
+const SCRAPER_RAW = 'https://raw.githubusercontent.com/mzf3334-dev/hkjc_scraper/main';
+
+/* ── State ───────────────────────────────────────── */
+let D        = [];       // all historical rows parsed from all_results.csv
+let RACECARD = null;     // today's racecard_today.json
+let activeRace = null;   // currently selected race_no string
+
+/* ── DOM refs ─────────────────────────────────────── */
+const $overlay      = document.getElementById('loadingOverlay');
+const $fullstate    = document.getElementById('fullstate');
+const $mainLayout   = document.getElementById('mainLayout');
+const $raceList     = document.getElementById('raceList');
+const $emptyState   = document.getElementById('emptyState');
+const $detailContent= document.getElementById('detailContent');
+const $panelDate    = document.getElementById('panelDate');
+const $hdrDate      = document.getElementById('hdrDate');
+const $retryBtn     = document.getElementById('retryBtn');
+
+/* ── Helpers ─────────────────────────────────────── */
+function stripCode(name) {
+  return (name || '').replace(/\([^)]+\)\s*$/, '').trim();
+}
+function horseCode(name) {
+  const m = (name || '').match(/\(([^)]+)\)\s*$/);
+  return m ? m[1] : '';
+}
+
+/* ── CSV parser ───────────────────────────────────── */
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  // Skip BOM + header, return array of arrays (same shape as prototype D)
+  return lines.slice(1).map(l => {
+    // Split on comma but respect quoted fields
+    const cols = [];
+    let cur = '', inQ = false;
+    for (const ch of l) {
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { cols.push(cur); cur = ''; }
+      else { cur += ch; }
+    }
+    cols.push(cur);
+    return cols;
+  }).filter(r => r.length >= 14);
+}
+
+/* ── Analytics (identical logic to prototype) ─────── */
+function detectPos(incident, gate) {
+  const t = incident || '';
+  const isFront = ['領放', '居前列', '前列位置', '在領放馬'].some(k => t.includes(k));
+  const isBack  = ['在馬群之後', '馬群後列', '後列', '居後', '在後', '馬群之後切入']
+                    .some(k => t.includes(k));
+  if (isFront && !isBack) return '前';
+  if (isBack  && !isFront) return '後';
+  if (isFront && isBack)   return '中';
+  const g = parseInt(gate) || 7;
+  if (g <= 4) return '前';
+  if (g <= 8) return '中';
+  return '後';
+}
+
+function typicalPos(horseName) {
+  const rows = D.filter(r => stripCode(r[6]) === horseName);
+  if (!rows.length) return '不明';
+  const cnt = {};
+  for (const r of rows) {
+    const p = detectPos(r[13], r[11]);
+    cnt[p] = (cnt[p] || 0) + 1;
+  }
+  return Object.entries(cnt).sort((a, b) => b[1] - a[1])[0][0];
+}
+
+function jockeyRecord(horseName, jockey) {
+  const rows = D.filter(r => stripCode(r[6]) === horseName && r[7] === jockey);
+  if (!rows.length) return { wins: 0, total: 0, label: '首次', hasWin: false };
+  const wins  = rows.filter(r => r[4] === '1').length;
+  const total = rows.length;
+  return { wins, total, label: `${wins}勝/${total}場`, hasWin: wins > 0 };
+}
+
+function posTri(pos) {
+  const active = pos === '前' ? 0 : pos === '後' ? 4 : pos === '中' ? 2 : -1;
+  return '<span class="tri-row">' +
+    [0,1,2,3,4].map(i => {
+      const on = i === active;
+      return `<span class="tri${on ? ' tri-on' : ''}">${on ? '\u25C0' : '\u25C1'}</span>`;
+    }).join('') + '</span>';
+}
+
+function trainerJockeyWinPct(trainer, jockey) {
+  const rows = D.filter(r => r[8] === trainer && r[7] === jockey);
+  if (!rows.length) return { label: '師騎首次', cls: 'rec-1st' };
+  const wins = rows.filter(r => r[4] === '1').length;
+  const pct  = Math.round(wins / rows.length * 100);
+  const cls  = pct >= 40 ? 'trj-h' : pct >= 20 ? 'trj-m' : 'trj-l';
+  return { label: `師騎 ${pct}%`, cls };
+}
+
+function sameDistChips(horseName, dist) {
+  const res = D
+    .filter(r => stripCode(r[6]) === horseName && r[2] === dist)
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .slice(0, 4).map(r => r[4]);
+  if (!res.length) return '<span class="no-form">—</span>';
+  return res.map(rank => {
+    const rk  = parseInt(rank) || 0;
+    const cls = rank === 'PU' ? 'fc-pu'
+              : rk === 1     ? 'fc-1'
+              : rk <= 3      ? 'fc-top'
+              : rk <= 6      ? 'fc-mid' : 'fc-tail';
+    return `<span class="fchip ${cls}">${rank}</span>`;
+  }).join('');
+}
+
+function buildPrediction(entries, dist) {
+  const distNum = parseInt(dist) || 1200;
+  // Convert racecard entries to D-format rows for scoring
+  const rows = entries.map(e => [
+    RACECARD.date, '', dist, '', '', e.horse_no, e.horse_name,
+    e.jockey, e.trainer, e.weight, '', e.gate, '', ''
+  ]);
+  const scored = rows.map(r => {
+    const horse   = stripCode(r[6]);
+    const jockey  = r[7];
+    const trainer = r[8];
+    const gate    = parseInt(r[11]) || 8;
+    let   score   = 0;
+    const reasons = [];
+
+    const recent = D.filter(x => stripCode(x[6]) === horse)
+      .sort((a, b) => b[0].localeCompare(a[0])).slice(0, 5);
+    if (recent.length) {
+      const avg = recent.reduce((s, x) =>
+        s + (x[4] === 'PU' ? 14 : (parseInt(x[4]) || 10)), 0) / recent.length;
+      const pts = Math.max(0, 30 - avg * 2.5);
+      score += pts;
+      if (pts >= 18) reasons.push('近仗優秀');
+    }
+
+    const dRec = D.filter(x => stripCode(x[6]) === horse && x[2] === dist)
+      .sort((a, b) => b[0].localeCompare(a[0])).slice(0, 4);
+    if (dRec.length) {
+      const avg = dRec.reduce((s, x) =>
+        s + (x[4] === 'PU' ? 14 : (parseInt(x[4]) || 10)), 0) / dRec.length;
+      const pts = Math.max(0, 25 - avg * 2);
+      score += pts;
+      if (pts >= 15) reasons.push('同程成績佳');
+    }
+
+    const jRaces = D.filter(x => x[7] === jockey);
+    if (jRaces.length) {
+      const rate = jRaces.filter(x => x[4] === '1').length / jRaces.length;
+      score += rate * 20;
+      if (rate >= 0.15) reasons.push('騎師勝率高');
+    }
+
+    const tjRaces = D.filter(x => x[7] === jockey && x[8] === trainer);
+    if (tjRaces.length) {
+      const rate = tjRaces.filter(x => x[4] === '1').length / tjRaces.length;
+      score += rate * 15;
+      if (rate >= 0.20) reasons.push('師騎配合佳');
+    }
+
+    if (distNum <= 1400 && gate <= 4) { score += 8; reasons.push('內檔有利'); }
+
+    return { entry: entries.find(e => e.horse_no === r[5]), horse, score, reasons: reasons.slice(0, 2) };
+  });
+  return scored.sort((a, b) => b.score - a.score);
+}
+
+/* ── Render race list ────────────────────────────── */
+function renderRaceList() {
+  $raceList.innerHTML = '';
+  if (!RACECARD || !RACECARD.races) return;
+  RACECARD.races.forEach(race => {
+    const div = document.createElement('div');
+    div.className = 'race-item' + (race.race_no === activeRace ? ' active' : '');
+    div.innerHTML = `
+      <div class="race-num">${race.race_no}</div>
+      <div class="race-info">
+        <div class="race-meta">本地賽事 &nbsp;·&nbsp; 下場參考</div>
+        <div class="race-dist">${race.distance || '—'}</div>
+        <div class="race-going">${race.going || '—'}</div>
+      </div>
+      <div class="race-chevron">›</div>`;
+    div.addEventListener('click', () => selectRace(race.race_no));
+    $raceList.appendChild(div);
+  });
+}
+
+/* ── Render detail panel ────────────────────────── */
+function renderDetail() {
+  if (!activeRace) {
+    $emptyState.hidden    = false;
+    $detailContent.hidden = true;
+    return;
+  }
+  $emptyState.hidden    = true;
+  $detailContent.hidden = false;
+
+  const race = RACECARD.races.find(r => r.race_no === activeRace);
+  if (!race) return;
+
+  const sorted = [...(race.entries || [])].sort((a, b) =>
+    parseInt(a.horse_no) - parseInt(b.horse_no));
+
+  let cards = '';
+  for (const entry of sorted) {
+    const horse   = stripCode(entry.horse_name);
+    const jockey  = entry.jockey;
+    const trainer = entry.trainer;
+    const weight  = entry.weight;
+    const gate    = entry.gate;
+    const code    = horseCode(entry.horse_name);
+    const silkUrl = code
+      ? `https://racing.hkjc.com/racing/content/Images/RaceColor/${code}.gif`
+      : '';
+
+    const pos      = typicalPos(horse);
+    const rec      = jockeyRecord(horse, jockey);
+    const recClass = rec.total === 0 ? 'rec-1st' : rec.hasWin ? 'rec-win' : 'rec-nw';
+    const trj      = trainerJockeyWinPct(trainer, jockey);
+    const form     = sameDistChips(horse, race.distance);
+
+    cards += `
+      <div class="horse-card">
+        <div class="horse-num">
+          ${entry.horse_no}
+          ${silkUrl ? `<div class="silk-wrap"><img class="silk-img" src="${silkUrl}" loading="lazy" onerror="this.parentNode.style.display='none'"></div>` : ''}
+        </div>
+        <div class="horse-left">
+          <div class="h-name">${horse}</div>
+          <div class="h-jockey"><span class="h-label">騎師</span>${jockey}</div>
+          <div class="h-trainer"><span class="h-label">練馬師</span>${trainer}</div>
+        </div>
+        <div class="horse-gate">
+          <div class="hg-num">${gate}</div>
+        </div>
+        <div class="horse-rec">
+          <span class="badge ${recClass}">${rec.label}</span>
+        </div>
+        <div class="horse-trj">
+          <span class="badge ${trj.cls}">${trj.label}</span>
+        </div>
+        <div class="horse-right">
+          <div class="hr-row1">
+            <div class="weight-val">${weight}<span class="weight-unit">磅</span></div>
+          </div>
+          <div class="hr-row2">${posTri(pos)}</div>
+          <div class="hr-row3">
+            <div class="form-chips">${form}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // Prediction box
+  const preds   = buildPrediction(race.entries || [], race.distance);
+  const maxScore= preds.length ? preds[0].score : 1;
+  const medals  = ['🥇','🥈','🥉','4️⃣'];
+  const sCls    = ['pred-s1','pred-s2','pred-s3','pred-s4'];
+  const predHTML= preds.length < 2 ? '' : (() => {
+    const slots = preds.slice(0, 4).map((p, i) => {
+      const pct = Math.min(92, Math.round(p.score / maxScore * 60 + 32));
+      const horseName = p.entry ? stripCode(p.entry.horse_name) : p.horse;
+      const horseNo   = p.entry ? p.entry.horse_no : '';
+      return `<div class="pred-slot ${sCls[i]}">
+        <div class="pred-rank">${medals[i]} 第${i+1}位</div>
+        <div class="pred-horse">${horseNo} · ${horseName}</div>
+        <div class="pred-bar-wrap">
+          <div class="pred-bar-bg"><div class="pred-bar" style="width:${pct}%"></div></div>
+          <span class="pred-pct">${pct}%</span>
+        </div>
+        <div class="pred-reason">${p.reasons.length ? p.reasons.join(' · ') : '資料不足'}</div>
+      </div>`;
+    }).join('');
+    return `<div class="pred-box"><div class="pred-title">🎯 分析預測 · 下場選駒</div>
+            <div class="pred-grid">${slots}</div></div>`;
+  })();
+
+  $detailContent.innerHTML = `
+    <div class="detail-hdr">
+      <div class="detail-label">本地賽事 · 下場分析參考（資料日期：${RACECARD.date}）</div>
+      <div class="detail-title">第 ${race.race_no} 場 &nbsp;·&nbsp; ${race.distance || ''}</div>
+      <div class="detail-meta">場地狀況：${race.going || '—'}</div>
+    </div>
+    ${predHTML}
+    <div class="card-legend">
+      <div class="cl-left">馬名 / 騎師 / 練馬師</div>
+      <div class="cl-gate">檔位</div>
+      <div class="cl-rec">騎配</div>
+      <div class="cl-trj">師騎勝率</div>
+      <div class="cl-right">
+        <span>負磅</span>
+        <span>走位（前 → 後）</span>
+        <span>同程成績</span>
+      </div>
+    </div>
+    ${cards}
+    <div style="height:16px"></div>`;
+}
+
+/* ── Select a race ───────────────────────────────── */
+function selectRace(raceNo) {
+  activeRace = raceNo;
+  renderRaceList();
+  renderDetail();
+}
+
+/* ── UI state helpers ────────────────────────────── */
+function showLoading(on) {
+  $overlay.classList.toggle('hidden', !on);
+}
+function showFullstate(icon, title, msg, showRetry) {
+  document.getElementById('fullstateIcon').textContent  = icon;
+  document.getElementById('fullstateTitle').textContent = title;
+  document.getElementById('fullstateMsg').textContent   = msg;
+  $retryBtn.classList.toggle('hidden', !showRetry);
+  $fullstate.classList.remove('hidden');
+  $mainLayout.classList.add('hidden');
+}
+
+/* ── Data loading ─────────────────────────────────── */
+async function loadData() {
+  showLoading(true);
+  $fullstate.classList.add('hidden');
+  $mainLayout.classList.add('hidden');
+
+  try {
+    const [racecard, csvText] = await Promise.all([
+      fetch(`${SCRAPER_RAW}/data/racecard_today.json`).then(r => {
+        if (!r.ok) throw new Error(`racecard_today.json 下載失敗 (${r.status})`);
+        return r.json();
+      }),
+      fetch(`${SCRAPER_RAW}/data/all_results.csv`).then(r => {
+        if (!r.ok) throw new Error(`all_results.csv 下載失敗 (${r.status})`);
+        return r.text();
+      }),
+    ]);
+
+    D        = parseCSV(csvText);
+    RACECARD = racecard;
+
+    if (!racecard.races || !racecard.races.length) {
+      showFullstate('📅', '今日沒有本地賽事', '請於下個賽事日再開啟此頁面。', false);
+      $hdrDate.textContent = '無賽事';
+      return;
+    }
+
+    // Init UI
+    const dateStr = racecard.date || '—';
+    $hdrDate.textContent  = dateStr + ' 賽事';
+    $panelDate.textContent = dateStr;
+
+    activeRace = racecard.races[0].race_no;
+    $mainLayout.classList.remove('hidden');
+    renderRaceList();
+    renderDetail();
+
+  } catch (e) {
+    console.error(e);
+    showFullstate('⚠️', '資料載入失敗', e.message, true);
+    $hdrDate.textContent = '載入失敗';
+  } finally {
+    showLoading(false);
+  }
+}
+
+/* ── Bootstrap ───────────────────────────────────── */
+loadData();
+</script>
+</body>
+</html>
