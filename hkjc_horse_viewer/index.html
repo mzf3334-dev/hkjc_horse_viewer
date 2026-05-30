@@ -55,6 +55,7 @@
       gap: 14px; z-index: 999;
     }
     .loading-overlay.hidden { display: none; }
+    .hidden { display: none !important; }
     .spinner {
       width: 40px; height: 40px;
       border: 4px solid #E5E7EB;
@@ -374,7 +375,7 @@
     <div class="panel-hdr">
       <div class="panel-hdr-title">本地賽事 · 下場分析</div>
       <div class="panel-hdr-date" id="panelDate">—</div>
-      <div class="panel-hdr-badge">今日賽事</div>
+      <div class="panel-hdr-badge">最新賽事卡</div>
     </div>
     <div id="raceList"></div>
   </nav>
@@ -417,6 +418,35 @@ const $retryBtn     = document.getElementById('retryBtn');
 function stripCode(name) {
   return (name || '').replace(/\([^)]+\)\s*$/, '').trim();
 }
+
+function isValidRaceEntry(entry) {
+  if (!entry) return false;
+  const horseNo = String(entry.horse_no || '').trim();
+  const horseName = String(entry.horse_name || '').trim();
+  const jockey = String(entry.jockey || '').trim();
+  const trainer = String(entry.trainer || '').trim();
+
+  // Ignore placeholder rows such as "S1 日本:" and incomplete entries.
+  if (!/^\d+$/.test(horseNo)) return false;
+  if (!horseName || !jockey || !trainer) return false;
+  return true;
+}
+
+function normalizeRacecardData(rawRacecard) {
+  const races = Array.isArray(rawRacecard?.races) ? rawRacecard.races : [];
+  const normalizedRaces = races
+    .map(r => ({
+      ...r,
+      entries: (r.entries || []).filter(isValidRaceEntry),
+    }))
+    .filter(r => (r.entries || []).length > 0);
+
+  return {
+    ...rawRacecard,
+    races: normalizedRaces,
+  };
+}
+
 function horseCode(name) {
   const m = (name || '').match(/\(([^)]+)\)\s*$/);
   return m ? m[1] : '';
@@ -735,20 +765,20 @@ async function loadData() {
     ]);
 
     D        = parseCSV(csvText);
-    RACECARD = racecard;
+    RACECARD = normalizeRacecardData(racecard);
 
-    if (!racecard.races || !racecard.races.length) {
-      showFullstate('📅', '今日沒有本地賽事', '請於下個賽事日再開啟此頁面。', false);
+    if (!RACECARD.races || !RACECARD.races.length) {
+      showFullstate('📅', '暫未有可用本地賽事卡', '如馬會已發佈下一賽日資料，請稍後重試。', false);
       $hdrDate.textContent = '無賽事';
       return;
     }
 
     // Init UI
-    const dateStr = racecard.date || '—';
+    const dateStr = RACECARD.date || '—';
     $hdrDate.textContent  = dateStr + ' 賽事';
     $panelDate.textContent = dateStr;
 
-    activeRace = racecard.races[0].race_no;
+    activeRace = RACECARD.races[0].race_no;
     $mainLayout.classList.remove('hidden');
     renderRaceList();
     renderDetail();
