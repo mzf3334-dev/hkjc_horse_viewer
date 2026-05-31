@@ -192,6 +192,7 @@
     /* ── Horse card ── */
     .horse-card {
       display: flex; align-items: center;
+      flex-wrap: wrap;
       background: var(--white);
       margin: 5px 8px;
       border-radius: 8px;
@@ -199,6 +200,17 @@
       box-shadow: 0 1px 3px rgba(0,0,0,.07);
       border-left: 4px solid #E5E7EB;
       transition: box-shadow .12s;
+    }
+    .horse-form-row {
+      width: 100%; flex-basis: 100%;
+      display: flex; align-items: center; gap: 8px;
+      padding-top: 7px; margin-top: 4px;
+      border-top: 1px solid #F0F0F0;
+    }
+    .hfr-label {
+      font-size: 10px; font-weight: 700; color: var(--t3);
+      text-transform: uppercase; letter-spacing: .4px;
+      white-space: nowrap; flex-shrink: 0;
     }
     .horse-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.12); }
 
@@ -754,7 +766,6 @@ function renderDetail() {
         </div>
         <div class="horse-right">
           <div class="hr-row2">${posTri(pos)}</div>
-          <div class="hr-row3"><div class="form-chips">${form}</div></div>
         </div>
         <div class="horse-meta-row">
           <span class="hm-gate">檔 ${gate}</span>
@@ -762,6 +773,9 @@ function renderDetail() {
           <span class="badge ${recClass}">${rec.label}</span>
           <span class="badge ${trj.cls}">${trj.label}</span>
           ${posTri(pos)}
+        </div>
+        <div class="horse-form-row">
+          <span class="hfr-label">近6次</span>
           <div class="form-chips">${form}</div>
         </div>
       </div>`;
@@ -805,7 +819,6 @@ function renderDetail() {
       <div class="cl-trj">師騎勝率</div>
       <div class="cl-right">
         <span>走位（前 → 後）</span>
-        <span>同程成績</span>
       </div>
     </div>
     ${cards}
