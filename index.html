@@ -326,18 +326,93 @@
     .pred-s4 .pred-pct { color: #6B7280; }
     .pred-reason { font-size: 10px; color: var(--t3); line-height: 1.4; }
 
+    /* ── Race strip (mobile selector) ── */
+    .race-strip {
+      display: none;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--white);
+      border-bottom: 2px solid var(--border);
+      position: sticky;
+      top: 50px;
+      z-index: 100;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    }
+    .race-strip::-webkit-scrollbar { display: none; }
+    .race-bubble {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 4px;
+      cursor: pointer; flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .rb-circle {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: #E8EFFF; color: var(--blue);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 800;
+      transition: background .15s, color .15s, transform .12s;
+    }
+    .race-bubble.active .rb-circle {
+      background: var(--blue); color: #fff;
+      transform: scale(1.08);
+      box-shadow: 0 3px 8px rgba(0,63,136,.35);
+    }
+    .rb-dist {
+      font-size: 9px; font-weight: 700;
+      color: var(--t3); white-space: nowrap;
+      letter-spacing: .2px;
+    }
+    .race-bubble.active .rb-dist { color: var(--blue); font-weight: 800; }
+
+    /* ── Horse mobile stats row ── */
+    .horse-meta-row {
+      display: none;
+      width: 100%;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding-top: 7px;
+      margin-top: 4px;
+      border-top: 1px solid #F0F0F0;
+      align-items: center;
+    }
+    .hm-gate {
+      font-size: 12px; font-weight: 700;
+      color: var(--blue);
+      background: #E8EFFF;
+      padding: 2px 8px; border-radius: 10px;
+    }
+    .hm-weight { font-size: 12px; font-weight: 600; color: var(--t2); }
+
     /* ── Responsive ── */
-    @media (max-width: 680px) {
+    @media (max-width: 679px) {
       .layout { flex-direction: column; height: auto; }
-      .race-panel {
-        width: 100%; border-right: none;
-        border-bottom: 2px solid var(--border);
-        max-height: 44vh;
+      .race-panel { display: none; }
+      .race-strip { display: flex; }
+      .detail-panel {
+        overflow: visible;
+        min-height: calc(100vh - 168px);
       }
-      .detail-panel { min-height: 50vh; }
-      .horse-card   { margin: 4px; }
-      .h-name       { font-size: 17px; }
-      .pred-grid    { grid-template-columns: repeat(2,1fr); }
+      .hdr { padding: 8px 14px; }
+      .hdr-sub { display: none; }
+      .hdr-title { font-size: 15px; }
+      .hdr-race-day { font-size: 11px; margin-left: auto; }
+      .horse-card {
+        margin: 4px 6px; padding: 10px 12px;
+        flex-wrap: wrap;
+      }
+      .horse-gate, .horse-rec, .horse-trj { display: none; }
+      .horse-right { display: none; }
+      .horse-meta-row { display: flex; }
+      .h-name { font-size: 16px; }
+      .card-legend { display: none; }
+      .pred-grid { grid-template-columns: repeat(2,1fr); }
+      .detail-title { font-size: 15px; }
+      .detail-hdr { padding: 10px 12px; }
+      .pred-box { margin: 6px; }
     }
   </style>
 </head>
@@ -366,6 +441,9 @@
   <div class="fs" id="fullstateMsg">請於下個賽事日再開啟此頁面。</div>
   <button class="retry-btn hidden" id="retryBtn" onclick="loadData()">重試</button>
 </div>
+
+<!-- ── Mobile Race Strip ─────────────────────────── -->
+<div class="race-strip hidden" id="raceStrip"></div>
 
 <!-- ── Main Layout ────────────────────────────────── -->
 <div class="layout hidden" id="mainLayout">
@@ -413,6 +491,7 @@ const $detailContent= document.getElementById('detailContent');
 const $panelDate    = document.getElementById('panelDate');
 const $hdrDate      = document.getElementById('hdrDate');
 const $retryBtn     = document.getElementById('retryBtn');
+const $raceStrip    = document.getElementById('raceStrip');
 
 /* ── Helpers ─────────────────────────────────────── */
 function stripCode(name) {
@@ -594,9 +673,25 @@ function buildPrediction(entries, dist) {
   return scored.sort((a, b) => b.score - a.score);
 }
 
+/* ── Render race strip (mobile) ─────────────────── */
+function renderRaceStrip() {
+  if (!$raceStrip || !RACECARD || !RACECARD.races) return;
+  $raceStrip.innerHTML = '';
+  RACECARD.races.forEach(race => {
+    const div = document.createElement('div');
+    div.className = 'race-bubble' + (race.race_no === activeRace ? ' active' : '');
+    div.innerHTML = `<div class="rb-circle">${race.race_no}</div><div class="rb-dist">${race.distance || ''}</div>`;
+    div.addEventListener('click', () => selectRace(race.race_no));
+    $raceStrip.appendChild(div);
+  });
+  const activeEl = $raceStrip.querySelector('.race-bubble.active');
+  if (activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+}
+
 /* ── Render race list ────────────────────────────── */
 function renderRaceList() {
   $raceList.innerHTML = '';
+  renderRaceStrip();
   if (!RACECARD || !RACECARD.races) return;
   RACECARD.races.forEach(race => {
     const div = document.createElement('div');
@@ -677,6 +772,14 @@ function renderDetail() {
             <div class="form-chips">${form}</div>
           </div>
         </div>
+        <div class="horse-meta-row">
+          <span class="hm-gate">檔 ${gate}</span>
+          <span class="hm-weight">${weight}磅</span>
+          <span class="badge ${recClass}">${rec.label}</span>
+          <span class="badge ${trj.cls}">${trj.label}</span>
+          ${posTri(pos)}
+          <div class="form-chips">${form}</div>
+        </div>
       </div>`;
   }
 
@@ -731,6 +834,9 @@ function selectRace(raceNo) {
   activeRace = raceNo;
   renderRaceList();
   renderDetail();
+  if (window.innerWidth <= 679) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 }
 
 /* ── UI state helpers ────────────────────────────── */
@@ -744,6 +850,7 @@ function showFullstate(icon, title, msg, showRetry) {
   $retryBtn.classList.toggle('hidden', !showRetry);
   $fullstate.classList.remove('hidden');
   $mainLayout.classList.add('hidden');
+  $raceStrip.classList.add('hidden');
 }
 
 /* ── Data loading ─────────────────────────────────── */
@@ -780,6 +887,7 @@ async function loadData() {
 
     activeRace = RACECARD.races[0].race_no;
     $mainLayout.classList.remove('hidden');
+    $raceStrip.classList.remove('hidden');
     renderRaceList();
     renderDetail();
 
