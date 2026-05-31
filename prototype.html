@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HKJC 賽馬分析 | 下場預測工具</title>
+  <style>
+    :root {
+      --blue:      #003F88;
+      --blue-lt:   #0055B3;
+      --bg:        #F0F2F5;
+      --white:     #FFFFFF;
+      --border:    #E0E0E0;
+      --t1:        #111111;
+      --t2:        #555555;
+      --t3:        #888888;
+      --gold:      #C8960C;
+      --silver:    #9CA3AF;
+      --bronze:    #A0522D;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, 'Noto Sans TC', BlinkMacSystemFont,
+                   'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--t1);
+    }
+
+    /* ── Header ── */
+    .hdr {
+      background: var(--blue);
+      color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: sticky; top: 0; z-index: 200;
+      box-shadow: 0 2px 8px rgba(0,0,0,.35);
+    }
+    .hdr-icon  { font-size: 26px; }
+    .hdr-title { font-size: 17px; font-weight: 700; letter-spacing: .4px; }
+    .hdr-sub   { font-size: 11px; opacity: .7; margin-top: 1px; }
+    .hdr-race-day {
+      margin-left: 12px; font-size: 12px;
+      background: rgba(255,255,255,.18);
+      padding: 3px 10px; border-radius: 12px;
+    }
+    .proto-badge {
+      margin-left: auto;
+      background: #F5A623; color: #000;
+      font-size: 11px; font-weight: 700;
+      padding: 3px 9px; border-radius: 12px;
+    }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      height: calc(100vh - 50px);
+    }
+
+    /* ── Race list panel ── */
+    .race-panel {
+      width: 300px; min-width: 260px;
+      background: var(--white);
+      overflow-y: auto;
+      border-right: 2px solid var(--border);
+      flex-shrink: 0;
+    }
+    .panel-hdr {
+      padding: 10px 14px;
+      background: #F8F8F8;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .panel-hdr-title {
+      font-size: 12px; font-weight: 600;
+      color: var(--blue); text-transform: uppercase;
+      letter-spacing: .5px; margin-bottom: 4px;
+    }
+    .panel-hdr-date {
+      font-size: 14px; font-weight: 700; color: var(--t1);
+      margin-bottom: 4px;
+    }
+    .panel-hdr-badge {
+      display: inline-block;
+      background: #E8F5E9; color: #1B5E20;
+      font-size: 11px; font-weight: 700;
+      padding: 2px 7px; border-radius: 10px;
+    }
+
+    /* Race item */
+    .race-item {
+      display: flex; align-items: flex-start;
+      padding: 13px 14px;
+      border-bottom: 1px solid #F0F0F0;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: background .12s;
+    }
+    .race-item:hover  { background: #F0F4FF; }
+    .race-item.active { background: #E8EFFF; border-left-color: var(--blue); }
+    .race-num {
+      width: 42px; height: 42px;
+      background: #E5E7EB; color: #444;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 19px; font-weight: 700;
+      flex-shrink: 0; margin-right: 12px; margin-top: 2px;
+      transition: background .12s, color .12s;
+    }
+    .race-item.active .race-num { background: var(--blue); color: #fff; }
+    .race-info { flex: 1; min-width: 0; }
+    .race-meta { font-size: 11px; color: var(--t3); margin-bottom: 2px; }
+    .race-dist { font-size: 21px; font-weight: 700; line-height: 1.2; }
+    .race-going { font-size: 12px; color: var(--t2); margin-top: 3px; }
+    .race-chevron { align-self: center; color: #CCC; font-size: 16px; margin-left: 6px; }
+
+    /* ── Detail panel ── */
+    .detail-panel {
+      flex: 1; overflow-y: auto;
+      background: var(--bg); min-width: 0;
+    }
+    .empty-state {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      height: 55%; gap: 8px;
+      color: #BBB; text-align: center;
+    }
+    .empty-state .ei   { font-size: 48px; }
+    .empty-state .etxt { font-size: 16px; }
+    .empty-state .esub { font-size: 12px; color: #CCC; }
+
+    /* Proto notice */
+    .proto-notice {
+      background: #FFFBEB;
+      border-left: 4px solid #F59E0B;
+      padding: 9px 14px; margin: 8px;
+      border-radius: 4px;
+      font-size: 12px; color: #78350F;
+      line-height: 1.5;
+    }
+
+    /* Race detail header */
+    .detail-hdr {
+      background: var(--white);
+      padding: 13px 16px;
+      border-bottom: 2px solid var(--blue);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .detail-label { font-size: 11px; color: var(--t3); margin-bottom: 2px; }
+    .detail-title {
+      font-size: 17px; font-weight: 700; color: var(--blue);
+      margin-bottom: 4px;
+    }
+    .detail-meta { font-size: 13px; color: var(--t2); }
+
+    /* Card legend row */
+    .card-legend {
+      display: flex; align-items: flex-start;
+      padding: 5px 16px 7px;
+      background: #FAFAFA; border-bottom: 1px solid var(--border);
+    }
+    .cl-left  { flex: 1; font-size: 10px; font-weight: 700; color: var(--t3);
+                text-transform: uppercase; letter-spacing: .4px; padding-top: 4px; }
+    .cl-right { display: flex; flex-direction: column; gap: 3px;
+                min-width: 155px; align-items: flex-end; }
+    .cl-right span { font-size: 9px; color: var(--t3); font-weight: 600; letter-spacing: .3px; }
+
+    /* ── Horse card ── */
+    .horse-card {
+      display: flex; align-items: center;
+      background: var(--white);
+      margin: 5px 8px;
+      border-radius: 8px;
+      padding: 11px 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.07);
+      border-left: 4px solid #E5E7EB;
+      transition: box-shadow .12s;
+    }
+    .horse-card:hover        { box-shadow: 0 3px 10px rgba(0,0,0,.12); }
+    .horse-card.r1           { border-left-color: var(--gold); }
+    .horse-card.r2           { border-left-color: var(--silver); }
+    .horse-card.r3           { border-left-color: var(--bronze); }
+
+    .horse-num {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      font-size: 15px; font-weight: 700; color: var(--t2);
+      width: 44px; flex-shrink: 0; margin-right: 10px;
+    }
+    .silk-wrap {
+      width: 38px; height: 38px; overflow: hidden;
+      border-radius: 4px; border: 1px solid #E0E0E0;
+      background: #F8F8F8;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .silk-img  { width: 38px; height: auto; display: block; }
+    .horse-gate {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      width: 44px; flex-shrink: 0; margin: 0 12px;
+    }
+    .hg-num { font-size: 22px; font-weight: 800; color: var(--blue); line-height: 1; }
+    .horse-rec {
+      display: flex; align-items: center; justify-content: center;
+      width: 60px; flex-shrink: 0; margin: 0 8px;
+    }
+    .cl-rec {
+      font-size: 10px; font-weight: 700; color: var(--t3);
+      text-transform: uppercase; letter-spacing: .4px;
+      width: 60px; margin: 0 8px; flex-shrink: 0;
+      text-align: center; padding-top: 4px;
+    }
+    .horse-trj {
+      display: flex; align-items: center; justify-content: center;
+      width: 64px; flex-shrink: 0; margin: 0 8px;
+    }
+    .cl-trj {
+      font-size: 10px; font-weight: 700; color: var(--t3);
+      text-transform: uppercase; letter-spacing: .4px;
+      width: 64px; margin: 0 8px; flex-shrink: 0;
+      text-align: center; padding-top: 4px;
+    }
+    .cl-gate {
+      font-size: 10px; font-weight: 700; color: var(--t3);
+      text-transform: uppercase; letter-spacing: .4px;
+      width: 44px; margin: 0 12px; flex-shrink: 0;
+      text-align: center; padding-top: 4px;
+    }
+    .horse-left  { flex: 1; min-width: 0; }
+    .h-name {
+      font-size: 19px; font-weight: 700; color: var(--t1);
+      margin-bottom: 4px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .h-jockey  { font-size: 13px; color: var(--t2); margin-bottom: 2px; }
+    .h-trainer { font-size: 12px; color: var(--t3); }
+    .h-label   { font-size: 11px; color: var(--t3); margin-right: 4px; }
+
+    .horse-right {
+      display: flex; flex-direction: column;
+      align-items: flex-end; gap: 5px;
+      margin-left: 12px; flex-shrink: 0; min-width: 155px;
+    }
+    .hr-row1 { display: flex; align-items: center; gap: 8px; }
+    .hr-row2 { display: flex; justify-content: flex-end; }
+    .hr-row3 { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+    /* Same-distance form chips */
+    .form-chips { display: inline-flex; gap: 3px; align-items: center; }
+    .fchip {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 22px; height: 22px; padding: 0 4px;
+      border-radius: 11px; font-size: 11px; font-weight: 700;
+    }
+    .fc-1    { background: var(--gold);   color: #fff; }
+    .fc-top  { background: var(--silver); color: #fff; }
+    .fc-mid  { background: #D1FAE5; color: #065F46; }
+    .fc-tail { background: #F3F4F6; color: #6B7280; }
+    .fc-pu   { background: #FEE2E2; color: #991B1B; }
+    .no-form { font-size: 13px; color: #CBD5E1; }
+    .weight-val  { font-size: 14px; font-weight: 600; white-space: nowrap; }
+    .weight-unit { font-size: 11px; color: var(--t3); }
+    .badge {
+      display: inline-flex; align-items: center;
+      font-size: 11px; font-weight: 700;
+      padding: 3px 8px; border-radius: 12px;
+      white-space: nowrap; line-height: 1.4;
+    }
+    /* Running position */
+    .pos-f   { background: #DBEAFE; color: #1E40AF; }  /* front - blue  */
+    .pos-m   { background: #FEF9C3; color: #854D0E; }  /* mid   - amber */
+    .pos-b   { background: #FCE7F3; color: #9D174D; }  /* back  - pink  */
+    .pos-u   { background: #F3F4F6; color: #6B7280; }  /* unknown       */
+    /* Jockey record */
+    .rec-win { background: #FEE2E2; color: #991B1B; }  /* has wins - red   */
+    .rec-nw  { background: #EFF6FF; color: #1E40AF; }  /* no wins  - blue  */
+    .rec-1st { background: #F0FDF4; color: #14532D; }  /* first    - green */
+    /* Running-position triangle bar */
+    .tri-row { display: inline-flex; gap: 3px; align-items: center; }
+    .tri     { font-size: 15px; color: #CBD5E1; line-height: 1; }
+    .tri-on  { color: #16A34A; }
+    /* Trainer-jockey % badge */
+    .trj-h   { background: #FFF7ED; color: #9A3412; }  /* ≥40% - orange */
+    .trj-m   { background: #F0FDF4; color: #14532D; }  /* ≥20% - green  */
+    .trj-l   { background: #F1F5F9; color: #475569; }  /* <20%  - slate  */
+
+    /* ── Prediction box ── */
+    .pred-box {
+      background: linear-gradient(135deg, #EEF2FF, #fff);
+      border-radius: 10px; margin: 8px;
+      padding: 12px 14px; border: 1.5px solid #C7D2FE;
+    }
+    .pred-title  { font-size: 13px; font-weight: 700; color: var(--blue); margin-bottom: 8px; }
+    .pred-grid   { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+    .pred-slot   {
+      padding: 9px 10px; background: #fff;
+      border-radius: 7px; border: 1px solid #E0E8FF;
+      box-shadow: 0 1px 3px rgba(0,63,136,.07);
+    }
+    .pred-rank   { font-size: 12px; margin-bottom: 3px; }
+    .pred-horse  {
+      font-size: 12px; font-weight: 700; color: var(--blue);
+      margin-bottom: 6px; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    .pred-bar-wrap { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .pred-bar-bg   { flex: 1; height: 7px; background: #E5E7EB; border-radius: 4px; overflow: hidden; }
+    .pred-bar      { height: 100%; border-radius: 4px; }
+    .pred-s1 .pred-bar { background: var(--gold); }
+    .pred-s2 .pred-bar { background: var(--silver); }
+    .pred-s3 .pred-bar { background: var(--bronze); }
+    .pred-s4 .pred-bar { background: #6B7280; }
+    .pred-pct    { font-size: 11px; font-weight: 700; min-width: 28px; text-align: right; }
+    .pred-s1 .pred-pct { color: #92660C; }
+    .pred-s2 .pred-pct { color: #6B7280; }
+    .pred-s3 .pred-pct { color: var(--bronze); }
+    .pred-s4 .pred-pct { color: #6B7280; }
+    .pred-reason { font-size: 10px; color: var(--t3); line-height: 1.4; }
+
+    /* ── Responsive ── */
+    @media (max-width: 680px) {
+      .layout { flex-direction: column; height: auto; }
+      .race-panel {
+        width: 100%; border-right: none;
+        border-bottom: 2px solid var(--border);
+        max-height: 44vh;
+      }
+      .detail-panel { min-height: 50vh; }
+      .horse-card   { margin: 4px; }
+      .h-name       { font-size: 17px; }
+      .pred-grid    { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────── -->
+<header class="hdr">
+  <span class="hdr-icon">🏇</span>
+  <div>
+    <div class="hdr-title">HKJC 賽馬分析</div>
+    <div class="hdr-sub">下場預測 · 馬匹分析工具</div>
+  </div>
+  <span class="hdr-race-day" id="hdrDate">載入中…</span>
+  <span class="proto-badge">原型 PROTOTYPE</span>
+</header>
+
+<!-- ── Main Layout ────────────────────────────────── -->
+<div class="layout">
+
+  <!-- Left: Race list -->
+  <nav class="race-panel" id="racePanel">
+    <div class="panel-hdr">
+      <div class="panel-hdr-title">本地賽事 · 下場分析</div>
+      <div class="panel-hdr-date" id="panelDate">—</div>
+      <div class="panel-hdr-badge">最新賽事</div>
+    </div>
+    <div id="raceList"></div>
+  </nav>
+
+  <!-- Right: Detail -->
+  <main class="detail-panel" id="detailPanel">
+    <div id="emptyState" hidden></div>
+    <div id="detailContent" hidden></div>
+  </main>
+
+</div><!-- /layout -->
+
+<script>
+/* ================================================================
+   DATA — embedded from hkjc_scraper/data CSV files
+   Columns: date, race, dist, going, rank, horseNo, horseName,
+            jockey, trainer, weight, horseWeight, gate, finishTime, incident
+   In production: fetch from
+     https://raw.githubusercontent.com/mzf3334-dev/hkjc_scraper/main/data/
+================================================================ */
+const D = [
+  // ── 2026/05/27  Race 1  1200m ──────────────────────────────────
+  ['2026/05/27','1','1200米','好地至快地','1','9','本能(K289)','周俊樂','徐雨石',125,1106,1,'1:09.81','直路彎受困而未能望空。'],
+  ['2026/05/27','1','1200米','好地至快地','2','11','東方福寶(K115)','潘明輝','姚本輝',117,1090,11,'1:09.86','向內斜跑，左邊韁繩脫手。'],
+  ['2026/05/27','1','1200米','好地至快地','3','10','星之願(J480)','潘頓','廖康銘',127,1038,3,'1:10.03',''],
+  ['2026/05/27','1','1200米','好地至快地','4','8','鑽得勝(K216)','布文','葉楚航',129,1026,5,'1:10.07','無特別報告。'],
+  ['2026/05/27','1','1200米','好地至快地','5','3','洛河(J308)','巴度','丁冠豪',135,1195,6,'1:10.16',''],
+  ['2026/05/27','1','1200米','好地至快地','6','7','建測精英(K198)','艾道拿','黎昭昇',130,1139,10,'1:10.20','無特別報告。'],
+  ['2026/05/27','1','1200米','好地至快地','7','6','五福星(J099)','霍宏聲','羅富全',132,1078,7,'1:10.40','無特別報告。'],
+  ['2026/05/27','1','1200米','好地至快地','8','4','喜行(K399)','班德禮','大衛希斯',134,1150,12,'1:10.53','自大外檔出閘後於早段在馬群之後切入。'],
+  ['2026/05/27','1','1200米','好地至快地','9','1','勇敢孖寶(K421)','何澤堯','呂健威',135,1150,9,'1:10.56','接近六百米處時開始搶口。'],
+  ['2026/05/27','1','1200米','好地至快地','10','2','魅力星(K052)','田泰安','蔡約翰',135,1195,2,'1:10.60','坐騎衝刺僅屬一般。'],
+  ['2026/05/27','1','1200米','好地至快地','11','12','威德勇士(J385)','巫顯東','鄭俊偉',113,1062,8,'1:10.94','自外檔出閘後於早段在馬群之後切入。'],
+  ['2026/05/27','1','1200米','好地至快地','12','5','飛越晨曦(K483)','梁家俊','伍鵬志',132,1122,4,'1:11.31','出閘緩慢。'],
+  // ── 2026/05/27  Race 2  2200m ──────────────────────────────────
+  ['2026/05/27','2','2200米','好地至快地','1','7','捷足奔馳(J524)','田泰安','姚本輝',127,1100,6,'2:16.17','早段沿途搶口。接近千八米處時失蹄。'],
+  ['2026/05/27','2','2200米','好地至快地','2','8','幸運同行(J331)','布文','蔡約翰',126,1011,5,'2:16.78','躍出時受擠迫。'],
+  ['2026/05/27','2','2200米','好地至快地','3','9','美麗多盈(G477)','鍾易禮','告東尼',119,1125,11,'2:17.02','自外檔出閘後於早段在馬群之後切入。'],
+  ['2026/05/27','2','2200米','好地至快地','4','3','香港精神(D241)','梁家俊','葉楚航',132,1057,12,'2:17.13','自大外檔出閘後於早段在馬群之後切入。'],
+  ['2026/05/27','2','2200米','好地至快地','5','12','同寶寶(H386)','黃寶妮','伍鵬志',108,1089,4,'2:17.31','躍出時向外斜跑。'],
+  ['2026/05/27','2','2200米','好地至快地','6','4','架勢奇爸(G312)','周俊樂','告東尼',129,1149,8,'2:17.52','大部分途程在沒有遮擋下走外疊。'],
+  ['2026/05/27','2','2200米','好地至快地','7','1','管之友(E496)','潘頓','賀賢',135,1154,1,'2:17.63','出閘緩慢。'],
+  ['2026/05/27','2','2200米','好地至快地','8','2','揚威四海(K120)','蔡明紹','葉楚航',135,1060,10,'2:17.67','接近二百米處時收慢。'],
+  ['2026/05/27','2','2200米','好地至快地','9','6','開心三多(H293)','巴度','桂福特',127,1035,2,'2:17.79','在領放下搶口。'],
+  ['2026/05/27','2','2200米','好地至快地','10','5','十力(K200)','奧爾民','伍鵬志',131,1140,7,'2:19.83','早段在馬群之後切入。'],
+  ['2026/05/27','2','2200米','好地至快地','11','10','皇金風速(E448)','楊明綸','蘇偉賢',119,1050,3,'2:20.71','大敗而回。'],
+  ['2026/05/27','2','2200米','好地至快地','12','11','幻影旋風(J271)','班德禮','丁冠豪',119,1100,9,'2:28.30','包尾大敗而回。'],
+  // ── 2026/05/27  Race 3  1650m ──────────────────────────────────
+  ['2026/05/27','3','1650米','好地至快地','1','3','大千雄心(K398)','莫雷拉','方嘉柏',133,1155,4,'1:39.19',''],
+  ['2026/05/27','3','1650米','好地至快地','2','1','魅力知耀(K428)','潘頓','大衛希斯',135,1235,3,'1:39.24',''],
+  ['2026/05/27','3','1650米','好地至快地','3','2','高高至高(L032)','霍宏聲','廖康銘',134,1119,5,'1:39.37','無特別報告。'],
+  ['2026/05/27','3','1650米','好地至快地','4','6','紅衣醒目(K184)','田泰安','羅富全',131,1055,10,'1:39.63','推進至窄位之際收慢。'],
+  ['2026/05/27','3','1650米','好地至快地','5','8','浪漫老撾(G476)','布文','巫偉傑',130,1166,1,'1:39.78','無特別報告。'],
+  ['2026/05/27','3','1650米','好地至快地','6','10','瑞祺威楓(K009)','布浩榮','姚本輝',124,1072,2,'1:40.03','出閘僅屬一般。'],
+  ['2026/05/27','3','1650米','好地至快地','7','5','爆出美麗(K155)','周俊樂','告東尼',129,1155,12,'1:40.07','自大外檔出閘後於早段在馬群之後切入。'],
+  ['2026/05/27','3','1650米','好地至快地','8','11','榮耀盛甲(K290)','巴度','游達榮',119,986,8,'1:40.11','起步後不久被碰撞。'],
+  ['2026/05/27','3','1650米','好地至快地','9','12','頌星(K343)','艾兆禮','賀賢',117,1032,9,'1:40.34','起步後不久發生碰撞。'],
+  ['2026/05/27','3','1650米','好地至快地','10','4','香港神駒(J266)','艾道拿','沈集成',133,1027,11,'1:40.41','自外檔出閘後於早段在馬群之後切入。'],
+  ['2026/05/27','3','1650米','好地至快地','11','7','魯班精神(J233)','班德禮','丁冠豪',130,1226,6,'1:41.55','躍出時向外斜跑。'],
+  ['2026/05/27','3','1650米','好地至快地','12','9','鬆啲(K384)','奧爾民','呂健威',127,1076,7,'1:42.55','躍出時發生碰撞。賽後流鼻血。'],
+  // ── 2026/05/27  Race 4  1200m ──────────────────────────────────
+  ['2026/05/27','4','1200米','好地至快地','1','5','朗日自強(J530)','梁家俊','文家良',127,1290,1,'1:09.70',''],
+  ['2026/05/27','4','1200米','好地至快地','2','11','天下寵兒(J359)','艾兆禮','廖康銘',119,1108,12,'1:09.89','大外檔出閘，居前列。'],
+  ['2026/05/27','4','1200米','好地至快地','3','9','頑童(L144)','楊明綸','鄭俊偉',122,1120,6,'1:10.02','無特別報告。'],
+  ['2026/05/27','4','1200米','好地至快地','4','8','三代至醒(L207)','希威森','呂健威',126,1155,9,'1:10.12','直路上內閃。'],
+  ['2026/05/27','4','1200米','好地至快地','5','7','至合拍(J253)','周俊樂','沈集成',125,1053,8,'1:10.18','起步後不久發生碰撞。'],
+  ['2026/05/27','4','1200米','好地至快地','6','12','友得盈(K106)','巫顯東','丁冠豪',115,1144,7,'1:10.24','起步後不久發生碰撞。'],
+  ['2026/05/27','4','1200米','好地至快地','7','10','悠然常勝(L136)','蔡明紹','巫偉傑',122,1014,3,'1:10.35','直路彎在前方馬匹之後受困。'],
+  ['2026/05/27','4','1200米','好地至快地','8','3','你知我得(H278)','布浩榮','姚本輝',132,1172,4,'1:10.45','坐騎出閘笨拙。'],
+  ['2026/05/27','4','1200米','好地至快地','9','1','紅愛舍(H110)','布文','韋達',135,1169,5,'1:10.64','坐騎居於馬群後列。'],
+  ['2026/05/27','4','1200米','好地至快地','10','2','贏得自然(J365)','何澤堯','葉楚航',134,1135,2,'1:10.85','無特別報告。'],
+  ['2026/05/27','4','1200米','好地至快地','11','6','快靚旺(K027)','莫雷拉','方嘉柏',127,1050,11,'1:11.25','坐騎在直路上未能追前。'],
+  ['2026/05/27','4','1200米','好地至快地','12','4','鄉村威龍(L325)','田泰安','蔡約翰',128,1093,10,'1:11.27','大部分途程在沒有遮擋下走外疊。'],
+  // ── 2026/05/27  Race 5  1650m ──────────────────────────────────
+  ['2026/05/27','5','1650米','好地至快地','1','2','穿甲金鷹(K566)','潘頓','廖康銘',130,1071,3,'1:38.99',''],
+  ['2026/05/27','5','1650米','好地至快地','2','6','智勇名駒(J298)','霍宏聲','呂健威',125,1181,10,'1:39.19',''],
+  ['2026/05/27','5','1650米','好地至快地','3','5','納百川(J276)','周俊樂','巫偉傑',123,1087,4,'1:39.28','直路上內閃。'],
+  ['2026/05/27','5','1650米','好地至快地','4','1','一定掂(J225)','布文','姚本輝',132,1099,7,'1:39.30','坐騎出閘迅速，居於較賽前部署為前的位置。'],
+  ['2026/05/27','5','1650米','好地至快地','5','4','有財有勢(H037)','艾道拿','蔡約翰',126,1094,5,'1:39.46','出閘僅屬一般。'],
+  ['2026/05/27','5','1650米','好地至快地','6','10','確好勁(K199)','田泰安','文家良',115,1098,2,'1:39.57','早段沿途搶口，不願穩定走勢。'],
+  ['2026/05/27','5','1650米','好地至快地','7','9','榮利雙收(K382)','班德禮','大衛希斯',120,1135,6,'1:39.62','坐騎陣上沿途略為搶口。'],
+  ['2026/05/27','5','1650米','好地至快地','8','8','凡凡有餘(J364)','希威森','沈集成',121,1202,1,'1:39.69','無特別報告。'],
+  ['2026/05/27','5','1650米','好地至快地','9','3','川河耀駒(L109)','莫雷拉','游達榮',129,1023,8,'1:39.79','坐騎出閘僅屬一般，居後。'],
+  ['2026/05/27','5','1650米','好地至快地','10','7','我做到(H381)','艾兆禮','伍鵬志',122,1100,9,'1:41.03','自外檔出閘後於早段在馬群之後切入。'],
+  // ── 2026/05/27  Race 6  1200m ──────────────────────────────────
+  ['2026/05/27','6','1200米','好地至快地','1','9','風采人生(J366)','莫雷拉','方嘉柏',122,1128,3,'1:09.67',''],
+  ['2026/05/27','6','1200米','好地至快地','2','8','花好月盈(H317)','班德禮','韋達',125,1198,1,'1:10.01',''],
+  ['2026/05/27','6','1200米','好地至快地','3','7','牛精新星(L200)','鍾易禮','告東尼',125,1015,7,'1:10.44','無特別報告。'],
+  ['2026/05/27','6','1200米','好地至快地','4','10','安定神駒(L059)','蔡明紹','廖康銘',122,1114,8,'1:10.44','出閘笨拙。'],
+  ['2026/05/27','6','1200米','好地至快地','5','1','跨境駿馬(L022)','潘頓','蔡約翰',135,1148,10,'1:10.51','被擠迫之際收慢。'],
+  ['2026/05/27','6','1200米','好地至快地','6','5','環球英雄(J413)','布文','大衛希斯',130,1112,5,'1:10.68','起步時向外斜跑及被碰撞。'],
+  ['2026/05/27','6','1200米','好地至快地','7','4','抱百嶺(K519)','周俊樂','葉楚航',129,1011,11,'1:10.94','躍出時被碰撞。'],
+  ['2026/05/27','6','1200米','好地至快地','8','2','團結巴打(L150)','田泰安','桂福特',134,1007,4,'1:10.97','出閘僅屬一般。'],
+  ['2026/05/27','6','1200米','好地至快地','9','12','過關勇士(K429)','希威森','沈集成',116,992,12,'1:11.46','起步時向內斜跑。'],
+  ['2026/05/27','6','1200米','好地至快地','10','3','飛輪霸(K320)','布浩榮','姚本輝',132,1141,9,'1:11.54','坐騎在直路上未能以勁勢衝刺。'],
+  ['2026/05/27','6','1200米','好地至快地','11','11','多多開心(L017)','巫顯東','鄭俊偉',115,1067,6,'1:12.00','出閘僅屬一般。'],
+  ['2026/05/27','6','1200米','好地至快地','PU','6','彩虹七色(K145)','艾兆禮','呂健威',129,1064,2,'---','於對面直路收停。'],
+  // ── 2026/05/27  Race 7  1200m ──────────────────────────────────
+  ['2026/05/27','7','1200米','好地至快地','1','9','幸運愉快(K064)','莫雷拉','巫偉傑',126,1106,6,'1:10.16',''],
+  ['2026/05/27','7','1200米','好地至快地','2','12','精益大師(H134)','黃寶妮','葉楚航',109,1093,9,'1:10.24',''],
+  ['2026/05/27','7','1200米','好地至快地','3','6','新力(H325)','蔡明紹','鄭俊偉',129,1112,4,'1:10.26','無特別報告。'],
+  ['2026/05/27','7','1200米','好地至快地','4','1','泰泰精神(K007)','潘頓','蔡約翰',135,1051,10,'1:10.43','在起步點被發現口內有血。'],
+  ['2026/05/27','7','1200米','好地至快地','5','11','良駒好友(H454)','何澤堯','文家良',122,1195,2,'1:10.50','躍出時觸碰閘廂左側。'],
+  ['2026/05/27','7','1200米','好地至快地','6','2','逍遙人生(J427)','希威森','沈集成',133,1275,8,'1:10.62','起步後不久受擠迫。'],
+  ['2026/05/27','7','1200米','好地至快地','7','7','加州勇勝(K364)','田泰安','告東尼',127,1067,7,'1:10.73','起步後不久受擠迫之際勒避。'],
+  ['2026/05/27','7','1200米','好地至快地','8','5','龍威心得(L120)','布文','大衛希斯',130,1090,12,'1:10.78','自大外檔出閘後於早段在馬群之後切入。'],
+  ['2026/05/27','7','1200米','好地至快地','9','3','千杯敬典(H321)','潘明輝','姚本輝',131,1120,1,'1:10.82','坐騎未能適應場地狀況。'],
+  // ── 2026/05/24  Race 1  1600m  (historical) ────────────────────
+  ['2026/05/24','1','1600米','好地','1','1','威力非凡(K152)','潘頓','賀賢',135,1022,4,'1:35.04',''],
+  ['2026/05/24','1','1600米','好地','2','14','勁爽(J003)','楊明綸','丁冠豪',116,1144,11,'1:35.05','起步時受擠迫。'],
+  ['2026/05/24','1','1600米','好地','3','6','神駒馬靈(J162)','奧爾民','廖康銘',133,1108,8,'1:35.16','推進至窄位之際難以望空。'],
+  ['2026/05/24','1','1600米','好地','4','7','志醒大將(K138)','麥道朗','沈集成',129,1134,1,'1:35.36','四百米受困。'],
+  ['2026/05/24','1','1600米','好地','5','13','極速之子(H332)','班德禮','姚本輝',116,1069,10,'1:35.53','中段搶口。'],
+  ['2026/05/24','1','1600米','好地','6','10','問鼎巔峰(K044)','周俊樂','游達榮',125,996,6,'1:35.64','收慢避開其他馬匹。'],
+  ['2026/05/24','1','1600米','好地','7','5','鐵甲驌龍(J459)','鍾易禮','告東尼',131,1130,2,'1:35.82','早段搶口。'],
+  ['2026/05/24','1','1600米','好地','8','11','熊噹噹(H002)','艾兆禮','蘇偉賢',123,1257,9,'1:36.01','無特別報告。'],
+  ['2026/05/24','1','1600米','好地','9','3','競駿傳奇(K465)','蔡明紹','蔡約翰',134,1132,5,'1:36.68','出閘僅屬一般。'],
+  ['2026/05/24','1','1600米','好地','10','9','肥仔精神(K110)','布文','巫偉傑',128,1169,13,'1:36.71','坐騎未能發揮。'],
+  ['2026/05/24','1','1600米','好地','11','2','競駿天下(G272)','田泰安','桂福特',134,1135,7,'1:36.84','大部分途程在沒有遮擋下走外疊。'],
+  ['2026/05/24','1','1600米','好地','12','12','東方魅影(K028)','黃寶妮','大衛希斯',111,1053,14,'1:38.03','領放後在直路上衝刺轉弱。'],
+  ['2026/05/24','1','1600米','好地','13','4','手到再來(H429)','袁幸堯','伍鵬志',123,1164,12,'1:38.14','須早段消耗氣力以取得領先。'],
+  ['2026/05/24','1','1600米','好地','14','8','快活同盟(K316)','霍宏聲','呂健威',129,1220,3,'1:38.86','包尾大敗而回。'],
+  // ── 2026/05/24  Race 2  1400m  (historical) ────────────────────
+  ['2026/05/24','2','1400米','好地至快地','1','14','金快飛飛(K121)','潘頓','丁冠豪',120,1088,5,'1:21.58','領放後勝出。'],
+  ['2026/05/24','2','1400米','好地至快地','2','1','包裝明將(L013)','金誠剛','姚本輝',135,1120,14,'1:21.92',''],
+  ['2026/05/24','2','1400米','好地至快地','3','2','嵐臣(K438)','韋紀力','巫偉傑',132,1154,1,'1:21.97','起步後不久外閃。'],
+  ['2026/05/24','2','1400米','好地至快地','4','8','幸福約定(L266)','麥道朗','大衛希斯',127,1092,4,'1:22.17','被擠迫之際收慢。'],
+  ['2026/05/24','2','1400米','好地至快地','5','11','華麗再贏(L087)','鍾易禮','沈集成',120,1037,2,'1:22.33','四百米受困。'],
+  ['2026/05/24','2','1400米','好地至快地','6','3','蹺妙(L031)','布浩榮','游達榮',131,1085,12,'1:22.33','大部分途程在沒有遮擋下走外疊。'],
+  ['2026/05/24','2','1400米','好地至快地','7','4','加州星馳(J123)','蔡明紹','告東尼',130,1175,6,'1:22.41','出閘緩慢。'],
+  ['2026/05/24','2','1400米','好地至快地','8','9','爽飆王子(L256)','潘明輝','賀賢',127,1063,10,'1:22.49','出閘笨拙。'],
+  ['2026/05/24','2','1400米','好地至快地','9','12','金運齊來(L026)','黃寶妮','文家良',114,1154,9,'1:22.56','受困。'],
+  ['2026/05/24','2','1400米','好地至快地','10','10','隋我同來(K332)','田泰安','桂福特',123,1164,3,'1:22.58','陣上發出呼吸聲。'],
+  ['2026/05/24','2','1400米','好地至快地','11','5','戀愛狂(K118)','霍宏聲','葉楚航',129,1129,7,'1:22.72',''],
+  ['2026/05/24','2','1400米','好地至快地','12','13','日日獎(H283)','莫雷拉','方嘉柏',120,1197,8,'1:22.97','選擇佔取前列位置領放。'],
+  ['2026/05/24','2','1400米','好地至快地','13','7','彪形勇將(L178)','奧爾民','蘇偉賢',127,1133,13,'1:22.98','出閘笨拙。'],
+  ['2026/05/24','2','1400米','好地至快地','14','6','綠色鐵驥(L255)','布文','伍鵬志',127,1121,11,'1:22.99','起步時向內斜跑。'],
+  // ── 2026/05/24  Race 3  1200m  (historical) ────────────────────
+  ['2026/05/24','3','1200米','好地至快地','1','1','錶之浩瀚(L106)','韋紀力','巫偉傑',135,1182,11,'1:09.30',''],
+  ['2026/05/24','3','1200米','好地至快地','2','2','巧眼光(J542)','艾兆禮','蔡約翰',133,1292,5,'1:09.41','向外移出紓緩擠迫。'],
+  ['2026/05/24','3','1200米','好地至快地','3','14','有你有我(H057)','金誠剛','廖康銘',119,979,3,'1:09.47','趨近三百米處時移至外側。'],
+  ['2026/05/24','3','1200米','好地至快地','4','9','賢者威楓(K040)','布浩榮','賀賢',127,1091,14,'1:09.56','自大外檔出閘後於早段在馬群之後切入。'],
+  ['2026/05/24','3','1200米','好地至快地','5','7','奇異歡星(K255)','田泰安','桂福特',129,1081,10,'1:09.59','出閘笨拙。'],
+  ['2026/05/24','3','1200米','好地至快地','6','6','銳不可當(L205)','奧爾民','蘇偉賢',129,1089,9,'1:09.62','無特別報告。'],
+  ['2026/05/24','3','1200米','好地至快地','7','8','金創福威(K002)','艾道拿','黎昭昇',128,1295,2,'1:09.74','躍出時觸碰閘廂右側。'],
+  ['2026/05/24','3','1200米','好地至快地','8','4','老鼠斑(L233)','麥道朗','沈集成',130,1047,4,'1:09.78','坐騎在直路上對催策毫無反應。'],
+  ['2026/05/24','3','1200米','好地至快地','9','5','文明戰士(L287)','布文','葉楚航',129,1191,1,'1:09.79','出閘笨拙，向內斜跑。'],
+  ['2026/05/24','3','1200米','好地至快地','10','3','常嚐發財(K293)','楊明綸','丁冠豪',131,1128,6,'1:09.89','無特別報告。'],
+  ['2026/05/24','3','1200米','好地至快地','11','10','川河石駒(K548)','莫雷拉','方嘉柏',127,1078,13,'1:10.04','自外檔出閘後於早段在馬群之後切入。'],
+  ['2026/05/24','3','1200米','好地至快地','12','12','同喜(J403)','袁幸堯','韋達',111,1096,8,'1:10.42','沿途走外疊，無遮擋。'],
+  ['2026/05/24','3','1200米','好地至快地','13','11','種得好(K579)','黃寶妮','文家良',118,1121,7,'1:10.52','無特別報告。'],
+  ['2026/05/24','3','1200米','好地至快地','14','13','駿皇逸(K330)','巫顯東','徐雨石',117,1157,12,'1:12.61','包尾大敗而回。'],
+  // ── 2026/05/24  Race 4  1200m  (historical) ────────────────────
+  ['2026/05/24','4','1200米','好地至快地','1','3','包裝天王(K570)','潘頓','沈集成',131,1132,9,'1:09.33',''],
+  ['2026/05/24','4','1200米','好地至快地','2','11','銀刺勇士(J043)','莫雷拉','方嘉柏',122,1108,14,'1:09.56',''],
+  ['2026/05/24','4','1200米','好地至快地','3','9','北極之錶(L211)','霍宏聲','廖康銘',127,1233,4,'1:09.56','居前列佔取位置。'],
+  ['2026/05/24','4','1200米','好地至快地','4','4','團結戰靈(K132)','田泰安','桂福特',130,1049,6,'1:09.59','無特別報告。'],
+  ['2026/05/24','4','1200米','好地至快地','5','13','旭能精英(K544)','蔡明紹','巫偉傑',119,1058,2,'1:09.67','無特別報告。'],
+  ['2026/05/24','4','1200米','好地至快地','6','5','美麗大獎(L326)','艾兆禮','蔡約翰',129,1131,5,'1:09.82','出閘緩慢。'],
+  ['2026/05/24','4','1200米','好地至快地','7','14','新力驕(J223)','班德禮','蘇偉賢',119,1168,7,'1:09.83','趨近四百米時向外移出。'],
+];
+
+/* ── Helpers ─────────────────────────────────────── */
+
+/** Strip "(CODE)" suffix from horse name */
+function stripCode(name) {
+  return (name || '').replace(/\([^)]+\)\s*$/, '').trim();
+}
+/** Extract the code inside "(CODE)" — e.g. "本能(K289)" → "K289" */
+function horseCode(name) {
+  const m = (name || '').match(/\(([^)]+)\)\s*$/);
+  return m ? m[1] : '';
+}
+
+/** Detect running position for ONE race from incident text + gate fallback.
+ *  Returns '前' | '中' | '後'
+ */
+function detectPos(incident, gate) {
+  const t = incident || '';
+  const isFront = ['領放', '居前列', '前列位置', '在領放馬'].some(k => t.includes(k));
+  const isBack  = ['在馬群之後', '馬群後列', '後列', '居後', '在後', '馬群之後切入']
+                    .some(k => t.includes(k));
+  if (isFront && !isBack) return '前';
+  if (isBack  && !isFront) return '後';
+  if (isFront && isBack)   return '中'; // mixed signals → middle
+  // Gate-number fallback
+  const g = parseInt(gate) || 7;
+  if (g <= 4) return '前';
+  if (g <= 8) return '中';
+  return '後';
+}
+
+/** Typical running position across ALL historical races for a horse (most frequent). */
+function typicalPos(horseName) {
+  const rows = D.filter(r => stripCode(r[6]) === horseName);
+  if (!rows.length) return '不明';
+  const cnt = {};
+  for (const r of rows) {
+    const p = detectPos(r[13], r[11]);
+    cnt[p] = (cnt[p] || 0) + 1;
+  }
+  return Object.entries(cnt).sort((a, b) => b[1] - a[1])[0][0];
+}
+
+/** Win record for (horse, jockey) pair across ALL historical data. */
+function jockeyRecord(horseName, jockey) {
+  const rows = D.filter(r => stripCode(r[6]) === horseName && r[7] === jockey);
+  if (!rows.length) return { wins: 0, total: 0, label: '首次', hasWin: false };
+  const wins  = rows.filter(r => r[4] === '1').length;
+  const total = rows.length;
+  return { wins, total, label: `${wins}勝/${total}場`, hasWin: wins > 0 };
+}
+
+/** 5-triangle running-position bar.
+ *  前 → 1st lit (leftmost), 中 → 3rd, 後 → 5th (rightmost).
+ *  ◁ = outline (grey), ◀ = filled (green).
+ */
+function posTri(pos) {
+  const active = pos === '前' ? 0 : pos === '後' ? 4 : pos === '中' ? 2 : -1;
+  return '<span class="tri-row">' +
+    [0,1,2,3,4].map(i => {
+      const on = i === active;
+      return `<span class="tri${on ? ' tri-on' : ''}">${on ? '\u25C0' : '\u25C1'}</span>`;
+    }).join('') + '</span>';
+}
+
+/** Win percentage for (trainer, jockey) pair across ALL historical data. */
+function trainerJockeyWinPct(trainer, jockey) {
+  const rows = D.filter(r => r[8] === trainer && r[7] === jockey);
+  if (!rows.length) return { label: '師騎首次', cls: 'rec-1st' };
+  const wins = rows.filter(r => r[4] === '1').length;
+  const pct  = Math.round(wins / rows.length * 100);
+  const cls  = pct >= 40 ? 'trj-h' : pct >= 20 ? 'trj-m' : 'trj-l';
+  return { label: `師騎 ${pct}%`, cls };
+}
+
+/** Last N same-distance finishing positions rendered as coloured chips.
+ *  Gold=1st  Silver=2-3  Green=4-6  Grey=7+  Red=PU
+ */
+function sameDistChips(horseName, dist, excludeDate) {
+  const res = D
+    .filter(r => stripCode(r[6]) === horseName && r[2] === dist && r[0] !== excludeDate)
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .slice(0, 4).map(r => r[4]);
+  if (!res.length) return '<span class="no-form">—</span>';
+  return res.map(rank => {
+    const rk  = parseInt(rank) || 0;
+    const cls = rank === 'PU' ? 'fc-pu'
+              : rk === 1     ? 'fc-1'
+              : rk <= 3      ? 'fc-top'
+              : rk <= 6      ? 'fc-mid' : 'fc-tail';
+    return '<span class="fchip ' + cls + '">' + rank + '</span>';
+  }).join('');
+}
+
+/** Score each horse and return array sorted best → worst.
+ *  Factors: recent form, same-dist form, jockey win %, trainer-jockey %, inner draw.
+ */
+function buildPrediction(raceRows, dist) {
+  const distNum = parseInt(dist) || 1200;
+  const scored  = raceRows.map(r => {
+    const horse   = stripCode(r[6]);
+    const jockey  = r[7];
+    const trainer = r[8];
+    const gate    = parseInt(r[11]) || 8;
+    let   score   = 0;
+    const reasons = [];
+
+    // 1. Recent form — last 5 any distance
+    const recent = D.filter(x => stripCode(x[6]) === horse)
+      .sort((a, b) => b[0].localeCompare(a[0])).slice(0, 5);
+    if (recent.length) {
+      const avg = recent.reduce((s, x) =>
+        s + (x[4] === 'PU' ? 14 : (parseInt(x[4]) || 10)), 0) / recent.length;
+      const pts = Math.max(0, 30 - avg * 2.5);
+      score += pts;
+      if (pts >= 18) reasons.push('近仗優秀');
+    }
+
+    // 2. Same-distance form — last 4
+    const dRec = D.filter(x => stripCode(x[6]) === horse && x[2] === dist)
+      .sort((a, b) => b[0].localeCompare(a[0])).slice(0, 4);
+    if (dRec.length) {
+      const avg = dRec.reduce((s, x) =>
+        s + (x[4] === 'PU' ? 14 : (parseInt(x[4]) || 10)), 0) / dRec.length;
+      const pts = Math.max(0, 25 - avg * 2);
+      score += pts;
+      if (pts >= 15) reasons.push('同程成績佳');
+    }
+
+    // 3. Jockey overall win rate
+    const jRaces = D.filter(x => x[7] === jockey);
+    if (jRaces.length) {
+      const rate = jRaces.filter(x => x[4] === '1').length / jRaces.length;
+      score += rate * 20;
+      if (rate >= 0.15) reasons.push('騎師勝率高');
+    }
+
+    // 4. Trainer-jockey combo
+    const tjRaces = D.filter(x => x[7] === jockey && x[8] === trainer);
+    if (tjRaces.length) {
+      const rate = tjRaces.filter(x => x[4] === '1').length / tjRaces.length;
+      score += rate * 15;
+      if (rate >= 0.20) reasons.push('師騎配合佳');
+    }
+
+    // 5. Inner draw bonus (short/mid race ≤1400m, gate ≤4)
+    if (distNum <= 1400 && gate <= 4) { score += 8; reasons.push('內檔有利'); }
+
+    return { r, horse, score, reasons: reasons.slice(0, 2) };
+  });
+  return scored.sort((a, b) => b.score - a.score);
+}
+
+/* ── Build data structures ───────────────────────── */
+
+/** Sorted unique dates (latest first) */
+const DATES = [...new Set(D.map(r => r[0]))].sort().reverse();
+
+/** Races for a given date: [{raceNo, dist, going, rows}] */
+function racesForDate(date) {
+  const byRace = {};
+  D.filter(r => r[0] === date).forEach(r => {
+    const rno = r[1];
+    if (!byRace[rno]) byRace[rno] = { raceNo: rno, dist: r[2], going: r[3], rows: [] };
+    byRace[rno].rows.push(r);
+  });
+  return Object.values(byRace).sort((a, b) => parseInt(a.raceNo) - parseInt(b.raceNo));
+}
+
+/* ── State ───────────────────────────────────────── */
+// Always auto-load the latest race day — no date selector needed.
+// (Production: detect next Wed/Sat/Sun race day from HKJC calendar)
+let activeDate  = DATES[0];
+let activeRace  = null; // raceNo string
+
+/* ── DOM references ────────────────────────────────── */
+const $raceList      = document.getElementById('raceList');
+const $emptyState    = document.getElementById('emptyState');
+const $detailContent = document.getElementById('detailContent');
+const $panelDate     = document.getElementById('panelDate');
+const $hdrDate       = document.getElementById('hdrDate');
+
+/* ── Render race list ────────────────────────────── */
+function renderRaceList() {
+  $raceList.innerHTML = '';
+  const races = racesForDate(activeDate);
+  races.forEach(race => {
+    const div = document.createElement('div');
+    div.className = 'race-item' + (race.raceNo === activeRace ? ' active' : '');
+    div.innerHTML = `
+      <div class="race-num">${race.raceNo}</div>
+      <div class="race-info">
+        <div class="race-meta">本地賽事 &nbsp;·&nbsp; 下場參考</div>
+        <div class="race-dist">${race.dist}</div>
+        <div class="race-going">${race.going}</div>
+      </div>
+      <div class="race-chevron">›</div>`;
+    div.addEventListener('click', () => selectRace(race.raceNo));
+    $raceList.appendChild(div);
+  });
+}
+
+/* ── Render detail panel ────────────────────────── */
+function renderDetail() {
+  if (!activeRace) {
+    $emptyState.hidden   = false;
+    $detailContent.hidden = true;
+    return;
+  }
+  $emptyState.hidden   = true;
+  $detailContent.hidden = false;
+
+  const races = racesForDate(activeDate);
+  const race  = races.find(r => r.raceNo === activeRace);
+  if (!race) return;
+
+  /* Sort by horse number (馬號) */
+  const sorted = [...race.rows].sort((a, b) => parseInt(a[5]) - parseInt(b[5]));
+
+  /* Build cards HTML */
+  let cards = '';
+  for (const r of sorted) {
+    const rank    = r[4];           // '1','2',…,'PU'
+    const rankInt = parseInt(rank) || 0;
+    const horse   = stripCode(r[6]);
+    const jockey  = r[7];
+    const trainer = r[8];
+    const weight  = r[9];
+    const gate    = r[11];
+    const code    = horseCode(r[6]);
+    const silkUrl = code
+      ? 'https://racing.hkjc.com/racing/content/Images/RaceColor/' + code + '.gif'
+      : '';
+
+    // Analytics
+    const pos      = typicalPos(horse);
+    const rec      = jockeyRecord(horse, jockey);
+    const recClass = rec.total === 0 ? 'rec-1st' : rec.hasWin ? 'rec-win' : 'rec-nw';
+    const trj      = trainerJockeyWinPct(trainer, jockey);
+    const form     = sameDistChips(horse, race.dist, activeDate);
+
+    // Card border for last-race top-3 finishers
+    const cardClass = rankInt === 1 ? 'r1' : rankInt === 2 ? 'r2' : rankInt === 3 ? 'r3' : '';
+
+    cards += `
+      <div class="horse-card ${cardClass}">
+        <div class="horse-num">
+          ${r[5]}
+          ${silkUrl ? '<div class="silk-wrap"><img class="silk-img" src="' + silkUrl + '" loading="lazy" onerror="this.parentNode.style.display=\'none\'"></div>' : ''}
+        </div>
+        <div class="horse-left">
+          <div class="h-name">${horse}</div>
+          <div class="h-jockey"><span class="h-label">騎師</span>${jockey}</div>
+          <div class="h-trainer"><span class="h-label">練馬師</span>${trainer}</div>
+        </div>
+        <div class="horse-gate">
+          <div class="hg-num">${gate}</div>
+        </div>
+        <div class="horse-rec">
+          <span class="badge ${recClass}">${rec.label}</span>
+        </div>
+        <div class="horse-trj">
+          <span class="badge ${trj.cls}">${trj.label}</span>
+        </div>
+        <div class="horse-right">
+          <div class="hr-row1">
+            <div class="weight-val">${weight}<span class="weight-unit">磅</span></div>
+          </div>
+          <div class="hr-row2">${posTri(pos)}</div>
+          <div class="hr-row3">
+            <div class="form-chips">${form}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // Build prediction panel
+  const preds    = buildPrediction(race.rows, race.dist);
+  const maxScore = preds.length ? preds[0].score : 1;
+  const medals   = ['🥇','🥈','🥉','4️⃣'];
+  const sCls     = ['pred-s1','pred-s2','pred-s3','pred-s4'];
+  const predHTML = preds.length < 2 ? '' : (() => {
+    const slots = preds.slice(0, 4).map((p, i) => {
+      const pct = Math.min(92, Math.round(p.score / maxScore * 60 + 32));
+      return '<div class="pred-slot ' + sCls[i] + '">' +
+        '<div class="pred-rank">' + medals[i] + ' 第' + (i+1) + '位</div>' +
+        '<div class="pred-horse">' + p.r[5] + ' · ' + p.horse + '</div>' +
+        '<div class="pred-bar-wrap"><div class="pred-bar-bg"><div class="pred-bar" style="width:' + pct + '%"></div></div>' +
+        '<span class="pred-pct">' + pct + '%</span></div>' +
+        '<div class="pred-reason">' + (p.reasons.length ? p.reasons.join(' · ') : '資料不足') + '</div></div>';
+    }).join('');
+    return '<div class="pred-box"><div class="pred-title">🎯 分析預測 · 下場選駒</div>' +
+           '<div class="pred-grid">' + slots + '</div></div>';
+  })();
+
+  $detailContent.innerHTML = `
+    <div class="proto-notice">
+      🔍 <strong>分析說明</strong>：
+      《同程成績》過往同路程排名（最近4次）：金=1名，銀=2-3，綠=4-6，灰=7+，紅=PU；
+      《檔位》五角形條顯示習慣前後位置；《騎配》騎師配此馬勝場/上陣；《師騎》配搭勝率。
+      預測模型綜合近仗、同程成績、騎師及師騎配合勝率計算，僅供參考。
+    </div>
+    <div class="detail-hdr">
+      <div class="detail-label">本地賽事 · 下場分析參考（資料日期：${activeDate}）</div>
+      <div class="detail-title">第 ${race.raceNo} 場 &nbsp;·&nbsp; ${race.dist}</div>
+      <div class="detail-meta">場地狀況：${race.going}</div>
+    </div>
+    ${predHTML}
+    <div class="card-legend">
+      <div class="cl-left">馬名 / 騎師 / 練馬師</div>
+      <div class="cl-gate">檔位</div>
+      <div class="cl-rec">騎配</div>
+      <div class="cl-trj">師騎勝率</div>
+      <div class="cl-right">
+        <span>負磅</span>
+        <span>走位（前 → 後）</span>
+        <span>同程成績</span>
+      </div>
+    </div>
+    ${cards}
+    <div style="height:16px"></div>`;
+}
+
+/* ── Select a race ────────────────────────────────── */
+function selectRace(raceNo) {
+  activeRace = raceNo;
+  renderRaceList();
+  renderDetail();
+}
+
+/* ── Init ────────────────────────────────────────────── */
+(function init() {
+  // Auto-load the latest race date
+  // Production: discover next Wed/Sat/Sun race day from HKJC and
+  // fetch its entry list CSV from hkjc_scraper/data/ on GitHub
+  $panelDate.textContent = activeDate;
+  $hdrDate.textContent   = activeDate + ' 賽事';
+  activeRace = (racesForDate(activeDate)[0] || {}).raceNo || null;
+  renderRaceList();
+  renderDetail();
+})();
+</script>
+</body>
+</html>
