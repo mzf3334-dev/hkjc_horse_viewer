@@ -146,6 +146,13 @@
     .race-meta { font-size: 11px; color: var(--t3); margin-bottom: 2px; }
     .race-dist { font-size: 21px; font-weight: 700; line-height: 1.2; }
     .race-going { font-size: 12px; color: var(--t2); margin-top: 3px; }
+    .going-badge {
+      display: inline-block;
+      background: #FFF7ED; color: #9A3412;
+      font-size: 12px; font-weight: 700;
+      padding: 1px 8px; border-radius: 10px;
+      border: 1px solid #FDBA74;
+    }
     .race-chevron { align-self: center; color: #CCC; font-size: 16px; margin-left: 6px; }
 
     /* ── Detail panel ── */
@@ -620,11 +627,28 @@ function sameDistChips(horseName, dist) {
   }).join('');
 }
 
-function buildPrediction(entries, dist) {
+function sameGoingChips(horseName, going) {
+  if (!going) return null;
+  const res = D
+    .filter(r => stripCode(r[6]) === horseName && r[3] === going)
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .slice(0, 4).map(r => r[4]);
+  if (!res.length) return '<span class="no-form">首次</span>';
+  return res.map(rank => {
+    const rk  = parseInt(rank) || 0;
+    const cls = rank === 'PU' ? 'fc-pu'
+              : rk === 1     ? 'fc-1'
+              : rk <= 3      ? 'fc-top'
+              : rk <= 6      ? 'fc-mid' : 'fc-tail';
+    return `<span class="fchip ${cls}">${rank}</span>`;
+  }).join('');
+}
+
+function buildPrediction(entries, dist, going) {
   const distNum = parseInt(dist) || 1200;
   // Convert racecard entries to D-format rows for scoring
   const rows = entries.map(e => [
-    RACECARD.date, '', dist, '', '', e.horse_no, e.horse_name,
+    RACECARD.date, '', dist, going || '', '', e.horse_no, e.horse_name,
     e.jockey, e.trainer, e.weight, '', e.gate, '', ''
   ]);
   const scored = rows.map(r => {
@@ -653,6 +677,18 @@ function buildPrediction(entries, dist) {
       const pts = Math.max(0, 25 - avg * 2);
       score += pts;
       if (pts >= 15) reasons.push('同程成績佳');
+    }
+
+    if (going) {
+      const gRec = D.filter(x => stripCode(x[6]) === horse && x[3] === going)
+        .sort((a, b) => b[0].localeCompare(a[0])).slice(0, 4);
+      if (gRec.length) {
+        const avg = gRec.reduce((s, x) =>
+          s + (x[4] === 'PU' ? 14 : (parseInt(x[4]) || 10)), 0) / gRec.length;
+        const pts = Math.max(0, 20 - avg * 1.5);
+        score += pts;
+        if (pts >= 12) reasons.push('場地成績佳');
+      }
     }
 
     const jRaces = D.filter(x => x[7] === jockey);
@@ -704,7 +740,9 @@ function renderRaceList() {
       <div class="race-info">
         <div class="race-meta">本地賽事 &nbsp;·&nbsp; 下場參考</div>
         <div class="race-dist">${race.distance || '—'}</div>
-        <div class="race-going">${race.going || '—'}</div>
+        <div class="race-going">${race.going
+          ? `<span class="going-badge">${race.going}</span>`
+          : '場地待公佈'}</div>
       </div>
       <div class="race-chevron">›</div>`;
     div.addEventListener('click', () => selectRace(race.race_no));
@@ -742,6 +780,7 @@ function renderDetail() {
     const recClass = rec.total === 0 ? 'rec-1st' : rec.hasWin ? 'rec-win' : 'rec-nw';
     const trj      = trainerJockeyWinPct(trainer, jockey);
     const form     = sameDistChips(horse, race.distance);
+    const goingForm = sameGoingChips(horse, race.going);
 
     cards += `
       <div class="horse-card">
@@ -775,14 +814,19 @@ function renderDetail() {
           ${posTri(pos)}
         </div>
         <div class="horse-form-row">
-          <span class="hfr-label">近6次</span>
+          <span class="hfr-label">同程</span>
           <div class="form-chips">${form}</div>
         </div>
+        ${goingForm !== null ? `
+        <div class="horse-form-row">
+          <span class="hfr-label">場地</span>
+          <div class="form-chips">${goingForm}</div>
+        </div>` : ''}
       </div>`;
   }
 
   // Prediction box
-  const preds   = buildPrediction(race.entries || [], race.distance);
+  const preds   = buildPrediction(race.entries || [], race.distance, race.going);
   const maxScore= preds.length ? preds[0].score : 1;
   const medals  = ['🥇','🥈','🥉','4️⃣'];
   const sCls    = ['pred-s1','pred-s2','pred-s3','pred-s4'];
@@ -809,7 +853,9 @@ function renderDetail() {
     <div class="detail-hdr">
       <div class="detail-label">本地賽事 · 下場分析參考（資料日期：${RACECARD.date}）</div>
       <div class="detail-title">第 ${race.race_no} 場 &nbsp;·&nbsp; ${race.distance || ''}</div>
-      <div class="detail-meta">場地狀況：${race.going || '—'}</div>
+      <div class="detail-meta">場地狀況：${race.going
+        ? `<span class="going-badge">${race.going}</span>`
+        : '<span style="color:var(--t3)">—</span>'}</div>
     </div>
     ${predHTML}
     <div class="card-legend">
@@ -819,6 +865,7 @@ function renderDetail() {
       <div class="cl-trj">師騎勝率</div>
       <div class="cl-right">
         <span>走位（前 → 後）</span>
+        <span>同程 · 場地成績</span>
       </div>
     </div>
     ${cards}
