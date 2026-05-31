@@ -361,12 +361,7 @@
       transform: scale(1.08);
       box-shadow: 0 3px 8px rgba(0,63,136,.35);
     }
-    .rb-dist {
-      font-size: 9px; font-weight: 700;
-      color: var(--t3); white-space: nowrap;
-      letter-spacing: .2px;
-    }
-    .race-bubble.active .rb-dist { color: var(--blue); font-weight: 800; }
+
 
     /* ── Horse mobile stats row ── */
     .horse-meta-row {
@@ -460,11 +455,7 @@
 
   <!-- Right: Detail -->
   <main class="detail-panel" id="detailPanel">
-    <div class="empty-state" id="emptyState">
-      <div class="ei">🏇</div>
-      <div class="etxt">選擇左方場次</div>
-      <div class="esub">查看馬匹分析及預測</div>
-    </div>
+    <div class="empty-state" id="emptyState" hidden></div>
     <div id="detailContent" hidden></div>
   </main>
 
@@ -680,7 +671,7 @@ function renderRaceStrip() {
   RACECARD.races.forEach(race => {
     const div = document.createElement('div');
     div.className = 'race-bubble' + (race.race_no === activeRace ? ' active' : '');
-    div.innerHTML = `<div class="rb-circle">${race.race_no}</div><div class="rb-dist">${race.distance || ''}</div>`;
+    div.innerHTML = `<div class="rb-circle">${race.race_no}</div>`;
     div.addEventListener('click', () => selectRace(race.race_no));
     $raceStrip.appendChild(div);
   });
@@ -712,11 +703,11 @@ function renderRaceList() {
 /* ── Render detail panel ────────────────────────── */
 function renderDetail() {
   if (!activeRace) {
-    $emptyState.hidden    = false;
+    if ($emptyState) $emptyState.hidden = false;
     $detailContent.hidden = true;
     return;
   }
-  $emptyState.hidden    = true;
+  if ($emptyState) $emptyState.hidden = true;
   $detailContent.hidden = false;
 
   const race = RACECARD.races.find(r => r.race_no === activeRace);
@@ -732,10 +723,7 @@ function renderDetail() {
     const trainer = entry.trainer;
     const weight  = entry.weight;
     const gate    = entry.gate;
-    const code    = horseCode(entry.horse_name);
-    const silkUrl = code
-      ? `https://racing.hkjc.com/racing/content/Images/RaceColor/${code}.gif`
-      : '';
+    const silkUrl = entry.silk_url || '';
 
     const pos      = typicalPos(horse);
     const rec      = jockeyRecord(horse, jockey);
