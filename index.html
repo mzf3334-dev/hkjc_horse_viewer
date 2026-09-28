@@ -322,6 +322,7 @@
       font-variant-numeric: tabular-nums;
     }
     .pred-box-a2 .pred-order { color: #047857; }
+    .pred-box-a3 .pred-order { color: #6D28D9; }
     .pred-panel:not([open]) .pred-order { display: inline-flex; }
     .pred-grid   { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
     .pred-slot   {
@@ -355,6 +356,18 @@
       border-color: #A7F3D0;
     }
     .pred-box-a2 .pred-title { color: #047857; }
+
+    /* ── Prediction algorithm 3: 精算信度速度模型 ── */
+    .pred-box-a3 {
+      background: linear-gradient(135deg, #F5F3FF, #fff);
+      border-color: #DDD6FE;
+    }
+    .pred-box-a3 .pred-title { color: #6D28D9; }
+    .pred-box-a3 .pred-slot {
+      border-color: #EDE9FE;
+      box-shadow: 0 1px 3px rgba(109, 40, 217, 0.06);
+    }
+
     .pred-badge-common {
       display: inline-block; font-size: 9px; font-weight: 700;
       background: #F59E0B; color: #fff; border-radius: 6px;
@@ -1180,6 +1193,287 @@ function buildPrediction2(entries, race) {
   return scored.sort((a, b) => b.prob - a.prob || Number(a.entry.horse_no) - Number(b.entry.horse_no));
 }
 
+/* ════════════ 預測算法3：精算信度速度模型 (Actuarial Credibility & Speed Model) ════════════ */
+const A3 = {
+  HALF_LIFE_DAYS: 120,    // 時間衰減半衰期 (120天)
+  K_HORSE: 4.0,           // 馬匹實力 Bühlmann-Straub 信度常數
+  K_JOCKEY: 18.0,         // 騎師信度常數
+  K_TRAINER: 22.0,        // 練馬師信度常數
+  K_JT: 6.0,              // 師騎組合信度常數
+  WEIGHT_COEFF: 0.045,    // 每磅負磅相對於1400米基準彈性係數
+  TEMP: 0.85,             // 多項 Logit 溫度係數
+};
+let IDX3 = null;
+
+function parseTimeSeconds3(timeStr) {
+  if (!timeStr) return null;
+  const match = String(timeStr).trim().match(/^(\d+):(\d+\.?\d*)$/);
+  if (!match) return null;
+  const sec = parseInt(match[1], 10) * 60 + parseFloat(match[2]);
+  return Number.isFinite(sec) && sec > 30 && sec < 250 ? sec : null;
+}
+
+function buildIndexes3() {
+  IDX3 = null;
+  const timeByDG = new Map();
+  const timeByD = new Map();
+
+  for (const r of D) {
+    const sec = parseTimeSeconds3(r[12]);
+    if (!sec) continue;
+    const dist = String(r[2] || '').trim();
+    const goingCat = goingCategory2(r[3]);
+    const key = dist + '|' + goingCat;
+    if (!timeByDG.has(key)) timeByDG.set(key, []);
+    timeByDG.get(key).push(sec);
+    if (!timeByD.has(dist)) timeByD.set(dist, []);
+    timeByD.get(dist).push(sec);
+  }
+
+  function computeBenchmark(list) {
+    if (!list || list.length < 3) return null;
+    const sorted = [...list].sort((a, b) => a - b);
+    const med = sorted[Math.floor(sorted.length / 2)];
+    const mean = sorted.reduce((s, x) => s + x, 0) / sorted.length;
+    const variance = sorted.reduce((s, x) => s + (x - mean) ** 2, 0) / sorted.length;
+    const std = Math.max(0.4, Math.sqrt(variance));
+    return { med, std };
+  }
+
+  const bmDG = new Map();
+  for (const [key, list] of timeByDG) {
+    const bm = computeBenchmark(list);
+    if (bm) bmDG.set(key, bm);
+  }
+  const bmD = new Map();
+  for (const [key, list] of timeByD) {
+    const bm = computeBenchmark(list);
+    if (bm) bmD.set(key, bm);
+  }
+
+  const byHorse = new Map();
+  const byJockey = new Map();
+  const byTrainer = new Map();
+  const byJT = new Map();
+
+  let winsCount = 0;
+  let placesCount = 0;
+  let totalValid = 0;
+
+  for (const r of D) {
+    const date = String(r[0] || '').trim();
+    const epoch = dateEpoch2(date);
+    if (!Number.isFinite(epoch)) continue;
+    const horse = stripCode(r[6]);
+    if (!horse) continue;
+    const jockey = String(r[7] || '').trim();
+    const trainer = String(r[8] || '').trim();
+    const dist = String(r[2] || '').trim();
+    const goingCat = goingCategory2(r[3]);
+    const rankStr = String(r[4] || '').trim();
+    const rankNum = parseInt(rankStr, 10);
+    const isFinished = Number.isInteger(rankNum) && rankNum > 0;
+    const rank = isFinished ? rankNum : 99;
+    const isWin = rank === 1;
+    const isPlace = rank >= 1 && rank <= 3;
+    totalValid += 1;
+    if (isWin) winsCount += 1;
+    if (isPlace) placesCount += 1;
+
+    const timeSec = parseTimeSeconds3(r[12]);
+    const bm = bmDG.get(dist + '|' + goingCat) || bmD.get(dist);
+    let speedFig = 0;
+    if (bm && timeSec) {
+      speedFig = Math.max(-2.5, Math.min(2.5, (bm.med - timeSec) / bm.std));
+    }
+
+    const rowObj = {
+      date, epoch, dist, goingCat, rank, isWin, isPlace,
+      speedFig, weight: parseFloat(r[9]) || 0, gate: parseInt(r[11], 10) || 0
+    };
+
+    if (!byHorse.has(horse)) byHorse.set(horse, []);
+    byHorse.get(horse).push(rowObj);
+
+    if (jockey) {
+      if (!byJockey.has(jockey)) byJockey.set(jockey, []);
+      byJockey.get(jockey).push(rowObj);
+    }
+    if (trainer) {
+      if (!byTrainer.has(trainer)) byTrainer.set(trainer, []);
+      byTrainer.get(trainer).push(rowObj);
+    }
+    if (jockey && trainer) {
+      const jtKey = jockey + '\u0000' + trainer;
+      if (!byJT.has(jtKey)) byJT.set(jtKey, []);
+      byJT.get(jtKey).push(rowObj);
+    }
+  }
+
+  const p0Win = totalValid ? winsCount / totalValid : 0.08;
+  const p0Place = totalValid ? placesCount / totalValid : 0.24;
+
+  IDX3 = {
+    byHorse, byJockey, byTrainer, byJT,
+    bmDG, bmD, p0Win, p0Place
+  };
+}
+
+function buildPrediction3(entries, race) {
+  if (!IDX3 || !entries || entries.length < 2) return [];
+  const asOfDate = String((race && race.date) || (RACECARD && RACECARD.date) || '');
+  const distance = String((race && race.distance) || '');
+  const distanceNumber = parseInt(distance, 10) || 1200;
+  const asOfEpoch = dateEpoch2(asOfDate);
+
+  const weights = entries.map(e => parseFloat(e.weight)).filter(w => Number.isFinite(w) && w > 0);
+  const sortedWeights = [...weights].sort((a, b) => a - b);
+  const medWeight = sortedWeights.length ? sortedWeights[Math.floor(sortedWeights.length / 2)] : 125;
+
+  const scored = entries.map(entry => {
+    const horse = stripCode(entry.horse_name);
+    const jockey = String(entry.jockey || '').trim();
+    const trainer = String(entry.trainer || '').trim();
+    const weight = parseFloat(entry.weight) || medWeight;
+    const gate = parseInt(entry.gate, 10) || 0;
+
+    // 1. 馬匹速度與近況 (時間指數衰減與信度加權)
+    const hAll = IDX3.byHorse.get(horse) || [];
+    const hHistory = hAll.filter(r => r.date < asOfDate);
+    let hatSpeed = 0;
+    let hatForm = 0;
+    let volPenalty = 0;
+    let distSpeedMax = -999;
+
+    if (hHistory.length) {
+      let wSum = 0;
+      let sSum = 0;
+      let fSum = 0;
+      const ranks = [];
+      for (const run of hHistory) {
+        const elapsedDays = Number.isFinite(asOfEpoch) && Number.isFinite(run.epoch)
+          ? Math.max(0, (asOfEpoch - run.epoch) / 86400000) : 180;
+        const decay = Math.exp(-elapsedDays / A3.HALF_LIFE_DAYS);
+        const distMult = (run.dist === distance) ? 1.3 : 0.8;
+        const weightFactor = decay * distMult;
+        wSum += weightFactor;
+        sSum += run.speedFig * weightFactor;
+        const formPt = run.isWin ? 1.0 : run.isPlace ? 0.6 : (run.rank <= 5 ? 0.25 : 0.0);
+        fSum += formPt * weightFactor;
+        ranks.push(run.rank);
+        if (run.dist === distance && run.speedFig > distSpeedMax) {
+          distSpeedMax = run.speedFig;
+        }
+      }
+
+      const meanSpeed = wSum > 0 ? sSum / wSum : 0;
+      const meanForm = wSum > 0 ? fSum / wSum : 0;
+      const zH = hHistory.length / (hHistory.length + A3.K_HORSE);
+      hatSpeed = zH * meanSpeed;
+      hatForm = zH * (meanForm - IDX3.p0Place);
+
+      if (ranks.length >= 3) {
+        const meanR = ranks.reduce((s, x) => s + x, 0) / ranks.length;
+        const varR = ranks.reduce((s, x) => s + (x - meanR) ** 2, 0) / ranks.length;
+        const stdR = Math.sqrt(varR);
+        volPenalty = 0.08 * Math.min(2.5, stdR / 3.5);
+      }
+    }
+
+    // 2. 騎師信度期望值
+    const jAll = IDX3.byJockey.get(jockey) || [];
+    const jHistory = jAll.filter(r => r.date < asOfDate);
+    let jScore = 0;
+    if (jHistory.length) {
+      const zJ = jHistory.length / (jHistory.length + A3.K_JOCKEY);
+      const winRate = jHistory.filter(r => r.isWin).length / jHistory.length;
+      const plcRate = jHistory.filter(r => r.isPlace).length / jHistory.length;
+      jScore = zJ * (0.6 * (plcRate - IDX3.p0Place) + 0.4 * (winRate - IDX3.p0Win));
+    }
+
+    // 3. 練馬師信度期望值
+    const tAll = IDX3.byTrainer.get(trainer) || [];
+    const tHistory = tAll.filter(r => r.date < asOfDate);
+    let tScore = 0;
+    if (tHistory.length) {
+      const zT = tHistory.length / (tHistory.length + A3.K_TRAINER);
+      const plcRate = tHistory.filter(r => r.isPlace).length / tHistory.length;
+      tScore = zT * (plcRate - IDX3.p0Place);
+    }
+
+    // 4. 騎練搭檔協同信度
+    const jtKey = jockey + '\u0000' + trainer;
+    const jtAll = IDX3.byJT.get(jtKey) || [];
+    const jtHistory = jtAll.filter(r => r.date < asOfDate);
+    let jtScore = 0;
+    if (jtHistory.length) {
+      const zJT = jtHistory.length / (jtHistory.length + A3.K_JT);
+      const winRate = jtHistory.filter(r => r.isWin).length / jtHistory.length;
+      jtScore = zJT * (winRate - IDX3.p0Win);
+    }
+
+    // 5. 負磅邊際彈性
+    const distFactor = distanceNumber / 1400;
+    const weightDelta = weight - medWeight;
+    const weightAdj = -A3.WEIGHT_COEFF * distFactor * weightDelta;
+
+    // 6. 跑道幾何與檔位優勢
+    let gateAdj = 0;
+    if (distanceNumber <= 1400) {
+      if (gate >= 1 && gate <= 3) gateAdj = 0.16;
+      else if (gate >= 4 && gate <= 6) gateAdj = 0.08;
+      else if (gate >= 7 && gate <= 9) gateAdj = -0.04;
+      else if (gate >= 10) gateAdj = -0.15;
+    } else {
+      if (gate >= 1 && gate <= 4) gateAdj = 0.08;
+      else if (gate >= 11) gateAdj = -0.08;
+    }
+
+    const utility = (
+      1.20 * hatSpeed +
+      1.10 * hatForm +
+      0.95 * jScore +
+      0.70 * tScore +
+      0.55 * jtScore +
+      weightAdj +
+      gateAdj -
+      volPenalty
+    );
+
+    // 精算理由分析
+    const reasonCandidates = [];
+    if (hatSpeed >= 0.45) reasonCandidates.push({ label: '速度指數頂尖', val: hatSpeed * 1.2 });
+    else if (hatSpeed >= 0.18) reasonCandidates.push({ label: '速度優勢', val: hatSpeed * 1.2 });
+
+    if (distSpeedMax >= 0.6) reasonCandidates.push({ label: '同程極速往績', val: 0.5 });
+    if (hatForm >= 0.15) reasonCandidates.push({ label: '近仗動量充沛', val: hatForm * 1.1 });
+    if (weightAdj >= 0.12) reasonCandidates.push({ label: '負磅優勢顯著', val: weightAdj });
+    if (gateAdj >= 0.12) reasonCandidates.push({ label: '黃金內檔幾何', val: gateAdj });
+    if (jScore >= 0.07) reasonCandidates.push({ label: '騎師高信度', val: jScore * 0.95 });
+    if (jtScore >= 0.04) reasonCandidates.push({ label: '師騎強勢組合', val: jtScore * 0.55 });
+    if (hHistory.length >= 3 && volPenalty <= 0.03) reasonCandidates.push({ label: '走勢穩健低險', val: 0.35 });
+
+    reasonCandidates.sort((a, b) => b.val - a.val);
+    let reasons = reasonCandidates.slice(0, 2).map(r => r.label);
+    if (!reasons.length) {
+      reasons = hHistory.length < 2 ? ['新出/少賽審慎'] : ['綜合評分均衡'];
+    }
+
+    return {
+      entry, horse, score: utility, reasons
+    };
+  });
+
+  const maxScore = Math.max(...scored.map(item => item.score));
+  const exps = scored.map(item => Math.exp((item.score - maxScore) / A3.TEMP));
+  const sumExp = exps.reduce((s, x) => s + x, 0) || 1;
+  scored.forEach((item, idx) => {
+    item.prob = exps[idx] / sumExp;
+  });
+
+  return scored.sort((a, b) => b.prob - a.prob || Number(a.entry.horse_no) - Number(b.entry.horse_no));
+}
+
 /* ── Render race strip (mobile) ─────────────────── */
 function renderRaceStrip() {
   if (!$raceStrip || !RACECARD || !RACECARD.races) return;
@@ -1349,6 +1643,35 @@ function renderDetail() {
       <div class="pred-grid">${slots}</div>
     </details>`;
   })();
+  const preds3 = buildPrediction3(race.entries || [], race);
+  const pred3HTML = preds3.length < 2 ? '' : (() => {
+    const slots = preds3.slice(0, 4).map((item, index) => {
+      const probability = item.prob * 100;
+      const pct = `${probability.toFixed(1)}%`;
+      const horseNo = item.entry ? String(item.entry.horse_no) : '';
+      const horseName = item.entry ? stripCode(item.entry.horse_name) : item.horse;
+      const actual = RACECARD.demo && item.entry
+        ? `<div class="pred-actual">${actualRankLabel2(item.entry)}</div>` : '';
+      return `<div class="pred-slot ${sCls[index]}">
+        <div class="pred-rank">${medals[index]} 第${index + 1}位</div>
+        <div class="pred-horse">${horseNo} · ${horseName}</div>
+        <div class="pred-bar-wrap">
+          <div class="pred-bar-bg"><div class="pred-bar" style="width:${Math.min(100, Math.max(0, probability))}%"></div></div>
+          <span class="pred-pct">${pct}</span>
+        </div>
+        <div class="pred-reason">${item.reasons.length ? item.reasons.join(' · ') : '資料不足'}</div>
+        ${actual}
+      </div>`;
+    }).join('');
+    const order = preds3.slice(0, 4).map(item => item.entry ? item.entry.horse_no : '').filter(Boolean).join('-');
+    return `<details class="pred-box pred-box-a3 pred-panel" open>
+      <summary class="pred-title">
+        <span class="pred-heading-label">精算信度速度模型</span>
+        <span class="pred-order" aria-label="預測第1至第4名">${order}</span>
+      </summary>
+      <div class="pred-grid">${slots}</div>
+    </details>`;
+  })();
 
   $detailContent.innerHTML = `
     <div class="detail-hdr">
@@ -1358,6 +1681,7 @@ function renderDetail() {
     </div>
     ${predHTML}
     ${pred2HTML}
+    ${pred3HTML}
     <div class="card-legend">
       <div class="cl-left">馬名 / 騎師 / 練馬師</div>
       <div class="cl-gw">檔 / 磅</div>
@@ -1432,6 +1756,12 @@ async function loadData() {
     } catch (e) {
       console.warn('算法2索引建立失敗，算法1不受影響', e);
       IDX2 = null;
+    }
+    try {
+      buildIndexes3();
+    } catch (e) {
+      console.warn('算法3索引建立失敗，其他算法不受影響', e);
+      IDX3 = null;
     }
 
     if (!RACECARD.races || !RACECARD.races.length) {
