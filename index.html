@@ -300,6 +300,29 @@
       padding: 12px 14px; border: 1.5px solid #C7D2FE;
     }
     .pred-title  { font-size: 13px; font-weight: 700; color: var(--blue); margin-bottom: 8px; }
+    .pred-panel > .pred-title {
+      display: flex; align-items: center; gap: 8px;
+      cursor: pointer; list-style: none;
+    }
+    .pred-panel > .pred-title::-webkit-details-marker { display: none; }
+    .pred-panel > .pred-title::marker { content: ''; }
+    .pred-panel > .pred-title::before {
+      content: ''; width: 0; height: 0; flex-shrink: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid currentColor;
+      transition: transform .15s;
+    }
+    .pred-panel:not([open]) > .pred-title { margin-bottom: 0; }
+    .pred-panel:not([open]) > .pred-title::before { transform: rotate(-90deg); }
+    .pred-heading-label { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .pred-order {
+      display: none; margin-left: auto; white-space: nowrap;
+      color: var(--blue); font-size: 13px; font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+    .pred-box-a2 .pred-order { color: #047857; }
+    .pred-panel:not([open]) .pred-order { display: inline-flex; }
     .pred-grid   { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
     .pred-slot   {
       padding: 9px 10px; background: #fff;
@@ -332,25 +355,12 @@
       border-color: #A7F3D0;
     }
     .pred-box-a2 .pred-title { color: #047857; }
-    .pred-note { font-size: 10px; font-weight: 400; color: #059669; margin-left: 6px; }
-    .pred-a2-tag {
-      display: inline-block; font-size: 10px; font-weight: 700;
-      background: #047857; color: #fff; border-radius: 8px;
-      padding: 1px 7px; margin-right: 6px; vertical-align: 1px;
-    }
     .pred-badge-common {
       display: inline-block; font-size: 9px; font-weight: 700;
       background: #F59E0B; color: #fff; border-radius: 6px;
       padding: 0 5px; margin-left: 4px; vertical-align: 1px;
     }
-    .consensus-banner {
-      display: flex; flex-wrap: wrap; gap: 2px 12px;
-      margin: 8px 8px 0; padding: 7px 12px;
-      background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 8px;
-      font-size: 12px; color: #92400E; line-height: 1.6;
-      overflow-wrap: anywhere;
-    }
-    .consensus-banner b { color: #78350F; }
+    .pred-actual { font-size: 10px; color: #047857; font-weight: 700; line-height: 1.4; }
 
     /* ── Race strip (mobile selector) ── */
     .race-strip {
@@ -541,6 +551,62 @@ function normalizeRacecardData(rawRacecard) {
     ...rawRacecard,
     races: normalizedRaces,
   };
+}
+
+function buildPreviousRaceDemo(rows) {
+  const nonFinishers = new Set(['PU', 'DNF', 'UR', 'FE']);
+  const races = new Map();
+  for (const row of rows) {
+    const date = String(row[0] || '').trim();
+    const raceNo = parseInt(row[1], 10);
+    const position = String(row[4] || '').trim();
+    const parsedPosition = parseInt(position, 10);
+    if (!date || !Number.isInteger(raceNo) ||
+        (!(Number.isInteger(parsedPosition) && parsedPosition > 0) && !nonFinishers.has(position.toUpperCase()))) continue;
+    const key = `${date}|${raceNo}`;
+    if (!races.has(key)) races.set(key, { date, raceNo, rows: [] });
+    races.get(key).rows.push(row);
+  }
+
+  const latestDate = [...races.values()].map(race => race.date).sort().at(-1);
+  if (!latestDate) throw new Error('歷史賽果中找不到可預覽的已完成賽事。');
+  const demoRaces = [...races.values()]
+    .filter(race => race.date === latestDate)
+    .sort((a, b) => a.raceNo - b.raceNo)
+    .map(race => ({
+      race_no: String(race.raceNo),
+      distance: String(race.rows[0][2] || '').trim(),
+      going: String(race.rows[0][3] || '').trim(),
+      entries: race.rows.map(row => ({
+        horse_no: String(row[5] || '').trim(),
+        horse_name: String(row[6] || '').trim(),
+        jockey: String(row[7] || '').trim(),
+        trainer: String(row[8] || '').trim(),
+        weight: String(row[9] || '').trim(),
+        gate: String(row[11] || '').trim(),
+        actual_rank: String(row[4] || '').trim(),
+      })).filter(isValidRaceEntry),
+    }))
+    .filter(race => race.entries.length >= 2);
+  if (!demoRaces.length) throw new Error('最近賽馬日沒有足夠有效排位可供預覽。');
+
+  return {
+    history: rows.filter(row => String(row[0] || '').trim() < latestDate),
+    racecard: {
+      date: latestDate,
+      demo: true,
+      races: demoRaces,
+    },
+  };
+}
+
+function actualRankLabel2(entry) {
+  const result = String((entry && entry.actual_rank) || '').trim();
+  const rank = parseInt(result, 10);
+  if (Number.isInteger(rank) && rank > 0) {
+    return `實際第${rank}名${result.includes('平頭馬') ? '（平頭）' : ''}`;
+  }
+  return result ? `實際 ${result}` : '實際未有名次';
 }
 
 function horseCode(name) {
@@ -1140,7 +1206,7 @@ function renderRaceList() {
     div.innerHTML = `
       <div class="race-num">${race.race_no}</div>
       <div class="race-info">
-        <div class="race-meta">本地賽事 &nbsp;·&nbsp; 下場參考</div>
+        <div class="race-meta">${RACECARD.demo ? '歷史賽事預覽' : '本地賽事 &nbsp;·&nbsp; 下場參考'}</div>
         <div class="race-dist">${race.distance || '—'}</div>
         <div class="race-going">${race.going || '—'}</div>
       </div>
@@ -1165,6 +1231,9 @@ function renderDetail() {
 
   const sorted = [...(race.entries || [])].sort((a, b) =>
     parseInt(a.horse_no) - parseInt(b.horse_no));
+  const detailLabel = RACECARD.demo
+    ? `歷史賽事預覽 · 排位由賽果重建；只使用 ${RACECARD.date} 前的歷史資料`
+    : `本地賽事 · 下場分析參考（資料日期：${RACECARD.date}）`;
 
   let cards = '';
   for (const entry of sorted) {
@@ -1227,6 +1296,8 @@ function renderDetail() {
       const pct = Math.min(92, Math.round(p.score / maxScore * 60 + 32));
       const horseName = p.entry ? stripCode(p.entry.horse_name) : p.horse;
       const horseNo   = p.entry ? p.entry.horse_no : '';
+      const actual = RACECARD.demo && p.entry
+        ? `<div class="pred-actual">${actualRankLabel2(p.entry)}</div>` : '';
       return `<div class="pred-slot ${sCls[i]}">
         <div class="pred-rank">${medals[i]} 第${i+1}位</div>
         <div class="pred-horse">${horseNo} · ${horseName}</div>
@@ -1235,10 +1306,17 @@ function renderDetail() {
           <span class="pred-pct">${pct}%</span>
         </div>
         <div class="pred-reason">${p.reasons.length ? p.reasons.join(' · ') : '資料不足'}</div>
+        ${actual}
       </div>`;
     }).join('');
-    return `<div class="pred-box"><div class="pred-title">🎯 預測算法1 · 加權評分</div>
-            <div class="pred-grid">${slots}</div></div>`;
+    const order = preds.slice(0, 4).map(p => p.entry ? p.entry.horse_no : '').filter(Boolean).join('-');
+    return `<details class="pred-box pred-panel" open>
+      <summary class="pred-title">
+        <span class="pred-heading-label">加權評分</span>
+        <span class="pred-order" aria-label="預測第1至第4名">${order}</span>
+      </summary>
+      <div class="pred-grid">${slots}</div>
+    </details>`;
   })();
   const preds2 = buildPrediction2(race.entries || [], race);
   const algorithm1Top4 = new Set(preds.slice(0, 4).map(item => String(item.entry && item.entry.horse_no || '')));
@@ -1249,6 +1327,8 @@ function renderDetail() {
       const horseNo = item.entry ? String(item.entry.horse_no) : '';
       const horseName = item.entry ? stripCode(item.entry.horse_name) : item.horse;
       const common = algorithm1Top4.has(horseNo) ? '<span class="pred-badge-common">兼中</span>' : '';
+      const actual = RACECARD.demo && item.entry
+        ? `<div class="pred-actual">${actualRankLabel2(item.entry)}</div>` : '';
       return `<div class="pred-slot ${sCls[index]}">
         <div class="pred-rank">${medals[index]} 第${index + 1}位${common}</div>
         <div class="pred-horse">${horseNo} · ${horseName}</div>
@@ -1257,33 +1337,25 @@ function renderDetail() {
           <span class="pred-pct">${pct}</span>
         </div>
         <div class="pred-reason">${item.reasons.length ? item.reasons.join(' · ') : '資料不足'}</div>
+        ${actual}
       </div>`;
     }).join('');
-    return `<div class="pred-box pred-box-a2">
-      <div class="pred-title"><span class="pred-a2-tag">新</span>📐 預測算法2 · WOE 貝氏機率模型<span class="pred-note">全場勝率合計 100%</span></div>
-      <div class="pred-grid">${slots}</div></div>`;
+    const order = preds2.slice(0, 4).map(item => item.entry ? item.entry.horse_no : '').filter(Boolean).join('-');
+    return `<details class="pred-box pred-box-a2 pred-panel" open>
+      <summary class="pred-title">
+        <span class="pred-heading-label">WOE 貝氏機率模型</span>
+        <span class="pred-order" aria-label="預測第1至第4名">${order}</span>
+      </summary>
+      <div class="pred-grid">${slots}</div>
+    </details>`;
   })();
-
-  const bannerHTML = (preds.length >= 2 && preds2.length >= 2) ? (() => {
-    const algorithm2Top4 = new Set(preds2.slice(0, 4).map(item => String(item.entry && item.entry.horse_no || '')));
-    const common = [...algorithm1Top4].filter(number => number && algorithm2Top4.has(number));
-    const algorithm1Only = [...algorithm1Top4].filter(number => number && !algorithm2Top4.has(number));
-    const algorithm2Only = [...algorithm2Top4].filter(number => number && !algorithm1Top4.has(number));
-    const format = numbers => numbers.sort((a, b) => Number(a) - Number(b)).map(number => `${number}號`).join('、') || '—';
-    return `<div class="consensus-banner">
-      <span><b>共同入選：</b>${format(common)}</span>
-      <span>算法1 獨選：${format(algorithm1Only)}</span>
-      <span>算法2 獨選：${format(algorithm2Only)}</span>
-    </div>`;
-  })() : '';
 
   $detailContent.innerHTML = `
     <div class="detail-hdr">
-      <div class="detail-label">本地賽事 · 下場分析參考（資料日期：${RACECARD.date}）</div>
+      <div class="detail-label">${detailLabel}</div>
       <div class="detail-title">第 ${race.race_no} 場 &nbsp;·&nbsp; ${race.distance || ''}</div>
       <div class="detail-meta">場地狀況：${race.going || '—'}</div>
     </div>
-    ${bannerHTML}
     ${predHTML}
     ${pred2HTML}
     <div class="card-legend">
@@ -1331,19 +1403,30 @@ async function loadData() {
   $mainLayout.classList.add('hidden');
 
   try {
+    const demoMode = new URLSearchParams(window.location.search).get('demo') === 'previous';
+    const localHistory = demoMode && ['localhost', '127.0.0.1'].includes(window.location.hostname);
+    const historyUrl = localHistory
+      ? '../hkjc_scraper/data/all_results.csv'
+      : `${SCRAPER_RAW}/data/all_results.csv`;
     const [racecard, csvText] = await Promise.all([
-      fetch(`${SCRAPER_RAW}/data/racecard_today.json`).then(r => {
+      demoMode ? Promise.resolve(null) : fetch(`${SCRAPER_RAW}/data/racecard_today.json`).then(r => {
         if (!r.ok) throw new Error(`racecard_today.json 下載失敗 (${r.status})`);
         return r.json();
       }),
-      fetch(`${SCRAPER_RAW}/data/all_results.csv`).then(r => {
+      fetch(historyUrl).then(r => {
         if (!r.ok) throw new Error(`all_results.csv 下載失敗 (${r.status})`);
         return r.text();
       }),
     ]);
 
     D        = parseCSV(csvText);
-    RACECARD = normalizeRacecardData(racecard);
+    if (demoMode) {
+      const demo = buildPreviousRaceDemo(D);
+      D = demo.history;
+      RACECARD = demo.racecard;
+    } else {
+      RACECARD = normalizeRacecardData(racecard);
+    }
     try {
       buildIndexes2();
     } catch (e) {
