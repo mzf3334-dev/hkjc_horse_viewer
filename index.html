@@ -321,9 +321,6 @@
       color: var(--blue); font-size: 13px; font-weight: 800;
       font-variant-numeric: tabular-nums;
     }
-    .pred-box-a2 .pred-order { color: #047857; }
-    .pred-box-a3 .pred-order { color: #6D28D9; }
-    .pred-box-a4 .pred-order { color: #9A3412; }
     .pred-panel:not([open]) .pred-order { display: inline-flex; }
     .pred-grid   { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
     .pred-slot   {
@@ -351,105 +348,31 @@
     .pred-s4 .pred-pct { color: #6B7280; }
     .pred-reason { font-size: 10px; color: var(--t3); line-height: 1.4; }
 
-    /* ── Prediction algorithm 2 ── */
-    .pred-box-a2 {
-      background: linear-gradient(135deg, #ECFDF5, #fff);
-      border-color: #A7F3D0;
-    }
-    .pred-box-a2 .pred-title { color: #047857; }
+    .pred-actual { font-size: 10px; color: #047857; font-weight: 700; line-height: 1.4; }
 
-    /* ── Prediction algorithm 3: 精算信度速度模型 ── */
-    .pred-box-a3 {
-      background: linear-gradient(135deg, #F5F3FF, #fff);
-      border-color: #DDD6FE;
+    /* ── Prediction model: GLM 5.3 洞燭先機 ── */
+    .pred-box-glm {
+      background: linear-gradient(135deg, #F5F3FF, #fff 58%);
+      border-color: #C4B5FD;
     }
-    .pred-box-a3 .pred-title { color: #6D28D9; }
-    .pred-box-a3 .pred-slot {
+    .pred-box-glm .pred-title,
+    .pred-box-glm .pred-order,
+    .pred-box-glm .pred-horse { color: #5B21B6; }
+    .pred-box-glm .pred-slot {
       border-color: #EDE9FE;
-      box-shadow: 0 1px 3px rgba(109, 40, 217, 0.06);
+      box-shadow: 0 1px 3px rgba(91, 33, 182, 0.06);
     }
-
-    /* ── Prediction algorithm 4: Grok4.7 玄機對弈 ── */
-    .pred-box-a4 {
-      background: linear-gradient(135deg, #FFF7ED, #fff 58%);
-      border-color: #FDBA74;
-    }
-    .pred-box-a4 .pred-title { color: #9A3412; }
-    .pred-box-a4 .pred-horse { color: #9A3412; }
-    .pred-box-a4 .pred-slot {
-      border-color: #FFEDD5;
-      box-shadow: 0 1px 3px rgba(154, 52, 18, 0.06);
-    }
-    .pred-box-a5 {
-      background: linear-gradient(135deg, #ECFEFF, #fff 58%);
-      border-color: #67E8F9;
-    }
-    .pred-box-a5 .pred-title,
-    .pred-box-a5 .pred-order,
-    .pred-box-a5 .pred-horse { color: #0E7490; }
-    .pred-box-a5 .pred-slot {
-      border-color: #CFFAFE;
-      box-shadow: 0 1px 3px rgba(14, 116, 144, 0.07);
-    }
-    .pred-insight {
-      font-size: 11px; line-height: 1.5; color: #9A3412;
-      background: rgba(255, 247, 237, 0.95);
-      border: 1px dashed #FDBA74; border-radius: 6px;
+    .pred-box-glm .pred-insight {
+      font-size: 11px; line-height: 1.5; color: #5B21B6;
+      background: rgba(245, 243, 255, 0.95);
+      border: 1px dashed #C4B5FD; border-radius: 6px;
       padding: 6px 8px; margin: 0 0 8px;
     }
-    .pred-box-a5 .pred-insight {
-      color: #0E7490;
-      background: rgba(236, 254, 255, 0.95);
-      border-color: #67E8F9;
-    }
-    /* ── Prediction algorithm 6: Deepseek Flash4.1 萃衡 ── */
-    .pred-box-a6 {
-      background: linear-gradient(135deg, #FFF1F2, #fff 58%);
-      border-color: #FDA4AF;
-    }
-    .pred-box-a6 .pred-title,
-    .pred-box-a6 .pred-order,
-    .pred-box-a6 .pred-horse { color: #BE123C; }
-    .pred-box-a6 .pred-slot {
-      border-color: #FFE4E6;
-      box-shadow: 0 1px 3px rgba(190, 18, 60, 0.06);
-    }
-    .pred-box-a6 .pred-insight {
-      color: #BE123C;
-      background: rgba(255, 241, 242, 0.95);
-      border-color: #FDA4AF;
-    }
-    /* ── Prediction algorithm 7: GLM 5.3 Flash 格物致知 ── */
-    .pred-box-a7 {
-      background: linear-gradient(135deg, #F1F5F9, #fff 58%);
-      border-color: #94A3B8;
-    }
-    .pred-box-a7 .pred-title,
-    .pred-box-a7 .pred-order,
-    .pred-box-a7 .pred-horse { color: #1E293B; }
-    .pred-box-a7 .pred-slot {
-      border-color: #E2E8F0;
-      box-shadow: 0 1px 3px rgba(30, 41, 59, 0.07);
-    }
-    .pred-box-a7 .pred-insight {
-      color: #1E293B;
-      background: rgba(241, 245, 249, 0.95);
-      border-color: #94A3B8;
-    }
-    .pred-badge-all, .pred-badge-unique {
+    .pred-glm-badge {
       display: inline-block; font-size: 9px; font-weight: 700;
-      color: #fff; border-radius: 6px;
+      background: #7C3AED; color: #fff; border-radius: 6px;
       padding: 0 5px; margin-left: 4px; vertical-align: 1px;
     }
-    .pred-badge-all { background: #9A3412; }
-    .pred-badge-unique { background: #0F766E; }
-
-    .pred-badge-common {
-      display: inline-block; font-size: 9px; font-weight: 700;
-      background: #F59E0B; color: #fff; border-radius: 6px;
-      padding: 0 5px; margin-left: 4px; vertical-align: 1px;
-    }
-    .pred-actual { font-size: 10px; color: #047857; font-weight: 700; line-height: 1.4; }
 
     /* ── Race strip (mobile selector) ── */
     .race-strip {
@@ -666,15 +589,22 @@ function buildPreviousRaceDemo(rows) {
       race_no: String(race.raceNo),
       distance: String(race.rows[0][2] || '').trim(),
       going: String(race.rows[0][3] || '').trim(),
-      entries: race.rows.map(row => ({
-        horse_no: String(row[5] || '').trim(),
-        horse_name: String(row[6] || '').trim(),
-        jockey: String(row[7] || '').trim(),
-        trainer: String(row[8] || '').trim(),
-        weight: String(row[9] || '').trim(),
-        gate: String(row[11] || '').trim(),
-        actual_rank: String(row[4] || '').trim(),
-      })).filter(isValidRaceEntry),
+      entries: race.rows.map(row => {
+        const rider = String(row[7] || '').trim();
+        const claimMatch = rider.match(/[（(]\s*-\s*(\d+)\s*[）)]/);
+        const claim = claimMatch ? Math.min(10, parseInt(claimMatch[1], 10) || 0) : 0;
+        const carried = parseFloat(row[9]);
+        return {
+          horse_no: String(row[5] || '').trim(),
+          horse_name: String(row[6] || '').trim(),
+          jockey: rider,
+          trainer: String(row[8] || '').trim(),
+          // Reconstruct the allocated handicap weight: actual carried + apprentice claim.
+          weight: Number.isFinite(carried) ? String(carried + claim) : String(row[9] || '').trim(),
+          gate: String(row[11] || '').trim(),
+          actual_rank: String(row[4] || '').trim(),
+        };
+      }).filter(isValidRaceEntry),
     }))
     .filter(race => race.entries.length >= 2);
   if (!demoRaces.length) throw new Error('最近賽馬日沒有足夠有效排位可供預覽。');
@@ -845,754 +775,60 @@ function buildPrediction(entries, dist) {
   return scored.sort((a, b) => b.score - a.score);
 }
 
-/* ════════════ 預測算法2：WOE 貝氏機率模型 ════════════ */
-const A2 = {
-  M: 10,
-  WOE_CLAMP: 1.6,
-  SCORE_CLAMP: 4.0,
-  TEMP: 1.0,
-  MIN_SAMPLE: 5,
-  RECENT_DAYS: 90,
-  RECENT_MIN: 10,
-  W: {
-    form: 0.16, dist: 0.13, going: 0.08, jockey: 0.13,
-    trainer: 0.09, jTop3: 0.05, tTop3: 0.04, jh: 0.09,
-    jt: 0.05, weight: 0.08, claim: 0.03, gate: 0.04, style: 0.03,
-  },
+/* ═══ GLM 5.3 洞燭先機 — model core start ═══ */
+/* 洞燭：在線 Elo 式評分逐仗更新——每仗只憑賽前資訊回推表現，絕無未來洩漏；
+   完成時間先換算為「落後頭馬長度」，扣除負磅、檔位偏差與受阻影響，
+   再按對手賽前評分回推該仗表現，更新馬匹實力評分。
+   先機：每駒 21 項特徵（實力、同程、近態、趨勢、穩定、復出、負磅、檔位、
+   騎練質素與近態、人馬合拍、換騎、對頭馬、場地、步速、級數、速度指數等）
+   經全局標準化後線性組合；權重以條件 Plackett-Luce 勝出對數似然配 L2 正則、
+   在走步回測上離線梯度學習而得（tools/train_glm.js 直接抽取本段訓練，
+   特徵計算與訓練時完全一致），輸出勝出與入位機率，預測頭四名。 */
+const GLM = {
+  // Trained offline on 941 walk-forward races from all_results.csv (tools/train_glm.js).
+  // Validation: 189 later races, top-1 27.5%, top-4 63.0% (random: 8.2% / 32.6%).
+  // Mean validation probability assigned to a winner: 13.5%.
+  BETA: [0.2100, 0.0515, 0.2471, 0.1792, -0.0243, 0.0598, 0.0331, 0.0358, 0.1351, 0.2064, 0.0209, 0.0160, 0.0560, -0.0000, 0.0152, 0.0626, 0.0361, 0.0623, -0.0218, 0.1018, 0.0890],
+  MEAN: [0.1459, 0.0261, 0.2625, 0.0084, 0.0224, 3.7237, 0.0293, -0.0097, 0.0258, 0.0207, -0.0005, 0.0284, 0.0043, -0.0069, -0.0018, -0.0008, -0.0107, -0.0063, 0.0864, 0.0115, 0.2146],
+  STD:  [0.7301, 0.1237, 0.2173, 0.0881, 0.0260, 1.1078, 0.0979, 0.6274, 0.4080, 0.4712, 0.2552, 0.1026, 0.4362, 0.1214, 0.1311, 0.3282, 0.1042, 0.0452, 0.2305, 3.3112, 0.4105],
+  LABELS: [
+    '實力評分', '同程優勢', '近仗入位', '狀態趨勢', '發揮波動',
+    '復出週期', '上仗受阻', '負磅輕盈', '檔位有利', '騎師質素',
+    '練馬師質素', '人馬合拍', '換騎升級', '騎師手熱', '練馬師熱',
+    '對頭馬佔優', '場地合拍', '步速對路', '對手轉弱', '速度指數',
+    '內檔短途',
+  ],
 };
-let IDX2 = null;
+let GLM_IDX = null;
 
-const REASON_LABEL2 = {
-  form: '近仗出色', dist: '同程往績佳', going: '場地合拍',
-  jockey: '騎師強', trainer: '練馬師強', jTop3: '騎師榜前3',
-  tTop3: '練馬師榜前3', jh: '人馬合拍', jt: '師騎配合佳',
-  weight: '負磅有利', claim: '減磅優惠', gate: '檔位有利',
-  style: '走位配檔佳',
-};
-
-function goingCategory2(value) {
-  const going = String(value || '').trim();
-  if (going === '好地至快地') return '快';
-  if (going === '好地') return '好';
-  if (going === '好地至黏地' || going === '黏地') return '黏';
-  if (going === '軟地' || going === '濕快地' || going === '濕慢地') return '軟';
-  if (going === '封地') return '封';
-  return '其他';
+function glmStrip(name) {
+  return String(name || '').replace(/\([^)]+\)\s*$/, '').trim();
 }
 
-function distBand2(distance) {
-  const metres = parseInt(distance, 10) || 0;
-  return metres <= 1400 ? '短途' : metres < 1800 ? '中途' : '長途';
+function glmEpoch(date) {
+  const m = String(date || '').match(/^(\d{4})\/(\d{2})\/(\d{2})$/);
+  return m ? Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : NaN;
 }
 
-function gateBucket2(gate) {
-  const number = parseInt(gate, 10) || 0;
-  return number <= 0 ? '' : number <= 3 ? '1-3' : number <= 7 ? '4-7' : number <= 11 ? '8-11' : '12+';
-}
-
-function weightBucket2(relativeWeight) {
-  if (relativeWeight >= 4) return '輕磅優勢大';
-  if (relativeWeight >= 1.5) return '略輕';
-  if (relativeWeight > -1.5) return '中性';
-  if (relativeWeight > -4) return '略重';
-  return '重磅劣勢大';
-}
-
-function seasonOf2(date) {
-  const year = Number(String(date || '').slice(0, 4));
-  const month = Number(String(date || '').slice(5, 7));
-  if (!Number.isFinite(year) || !Number.isFinite(month) || !year || !month) return null;
-  return month >= 9 ? year : year - 1;
-}
-
-function dateEpoch2(date) {
-  const match = String(date || '').match(/^(\d{4})\/(\d{2})\/(\d{2})$/);
-  return match ? Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])) : NaN;
-}
-
-function median2(values) {
-  const sorted = values.filter(Number.isFinite).sort((a, b) => a - b);
+function glmMedian(list) {
+  const sorted = [...list].filter(Number.isFinite).sort((a, b) => a - b);
   if (!sorted.length) return 0;
-  const middle = Math.floor(sorted.length / 2);
-  return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
+  const mid = sorted.length >> 1;
+  return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
 }
 
-function addStat2(stats, key, win) {
-  if (key === null || key === undefined || key === '') return;
-  let stat = stats.get(key);
-  if (!stat) {
-    stat = { starts: 0, wins: 0 };
-    stats.set(key, stat);
-  }
-  stat.starts += 1;
-  if (win) stat.wins += 1;
+function glmClamp(value, lo, hi) {
+  return Number.isFinite(value) ? Math.max(lo, Math.min(hi, value)) : 0;
 }
 
-function mEstimate2(wins, starts) {
-  const prior = IDX2 ? IDX2.p0 : 0.08;
-  const sample = Math.max(0, Number(starts) || 0);
-  return ((Number(wins) || 0) + A2.M * prior) / (sample + A2.M);
-}
-
-function woe2(probability) {
-  if (!IDX2 || !Number.isFinite(probability) || probability <= 0) return 0;
-  const value = Math.log(probability / IDX2.p0);
-  return Math.max(-A2.WOE_CLAMP, Math.min(A2.WOE_CLAMP, value));
-}
-
-function woeForRows2(rows) {
-  if (!rows || !rows.length) return 0;
-  let wins = 0;
-  for (const row of rows) if (row.win) wins += 1;
-  return woe2(mEstimate2(wins, rows.length));
-}
-
-function buildWoeTable2(rows, keyOf, minStarts = 0) {
-  const stats = new Map();
-  for (const row of rows) addStat2(stats, keyOf(row), row.win);
-  const table = new Map();
-  for (const [key, stat] of stats) {
-    table.set(key, stat.starts < minStarts ? 0 : woe2(mEstimate2(stat.wins, stat.starts)));
-  }
-  return table;
-}
-
-function pushIndex2(index, key, row) {
-  if (!key) return;
-  if (!index.has(key)) index.set(key, []);
-  index.get(key).push(row);
-}
-
-function topThree2(counts) {
-  return new Set([...counts.entries()]
-    .sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
-    .slice(0, 3)
-    .map(([name]) => name));
-}
-
-function percentile2(values, quantile) {
-  const sorted = values.filter(Number.isFinite).sort((a, b) => a - b);
-  if (!sorted.length) return 0;
-  const position = (sorted.length - 1) * quantile;
-  const lower = Math.floor(position);
-  const upper = Math.ceil(position);
-  if (lower === upper) return sorted[lower];
-  return sorted[lower] + (sorted[upper] - sorted[lower]) * (position - lower);
-}
-
-function claimEstimate2(rows) {
-  if (!rows || !rows.length) return 0;
-  // Positive relative weight means the jockey's mount carried less than the race median.
-  const estimate = Math.max(0, Math.min(10, Math.round(percentile2(rows.map(row => row.relW), 0.25))));
-  return [0, 2, 3, 5, 7, 10].reduce((best, value) =>
-    Math.abs(value - estimate) < Math.abs(best - estimate) ? value : best, 0);
-}
-
-function historyBefore2(rows, asOfDate) {
-  if (!rows || !asOfDate) return [];
-  return rows.filter(row => row.date < asOfDate);
-}
-
-function recentRateWoe2(rows, asOfDate) {
-  const history = historyBefore2(rows, asOfDate);
-  if (!history.length) return 0;
-  let wins = 0;
-  for (const row of history) if (row.win) wins += 1;
-  const careerRate = mEstimate2(wins, history.length);
-  const asOfEpoch = dateEpoch2(asOfDate);
-  if (!Number.isFinite(asOfEpoch)) return woe2(careerRate);
-  const windowStart = asOfEpoch - A2.RECENT_DAYS * 86400000;
-  const recent = history.filter(row => row.epoch >= windowStart && row.epoch < asOfEpoch);
-  if (recent.length < A2.RECENT_MIN) return woe2(careerRate);
-  let recentWins = 0;
-  for (const row of recent) if (row.win) recentWins += 1;
-  const recentRate = mEstimate2(recentWins, recent.length);
-  return woe2(0.6 * careerRate + 0.4 * recentRate);
-}
-
-function latestHistory2(rows, asOfDate, limit) {
-  const latest = [];
-  if (!rows || !asOfDate) return latest;
-  for (let index = rows.length - 1; index >= 0 && latest.length < limit; index -= 1) {
-    if (rows[index].date < asOfDate) latest.push(rows[index]);
-  }
-  return latest;
-}
-
-function currentTopThree2(kind, asOfDate) {
-  const key = `${kind}|${asOfDate}`;
-  if (IDX2.top3Cache.has(key)) return IDX2.top3Cache.get(key);
-  const season = seasonOf2(asOfDate);
-  const counts = new Map();
-  if (season !== null) {
-    for (const row of IDX2.rows) {
-      const name = kind === 'jockey' ? row.jockey : row.trainer;
-      if (row.date >= asOfDate || seasonOf2(row.date) !== season || !row.win || !name) continue;
-      counts.set(name, (counts.get(name) || 0) + 1);
-    }
-  }
-  const result = { names: topThree2(counts), hasHistory: counts.size > 0 };
-  IDX2.top3Cache.set(key, result);
-  return result;
-}
-
-function buildIndexes2() {
-  IDX2 = null;
-  const styleCounts = new Map();
-  for (const raw of D) {
-    const horse = stripCode(raw[6]);
-    if (!horse) continue;
-    const position = detectPos(raw[13], raw[11]);
-    if (!styleCounts.has(horse)) styleCounts.set(horse, new Map());
-    const counts = styleCounts.get(horse);
-    counts.set(position, (counts.get(position) || 0) + 1);
-  }
-  const styleOf = new Map();
-  for (const [horse, counts] of styleCounts) {
-    let bestPosition = '不明';
-    let bestCount = 0;
-    for (const [position, count] of counts) {
-      if (count > bestCount) {
-        bestPosition = position;
-        bestCount = count;
-      }
-    }
-    styleOf.set(horse, bestPosition);
-  }
-
-  const nonFinishers = new Set(['PU', 'DNF', 'UR', 'FE']);
-  const rows = [];
-  for (const raw of D) {
-    const date = String(raw[0] || '').trim();
-    const raceNumber = parseInt(raw[1], 10);
-    const positionText = String(raw[4] || '').trim();
-    const numericPosition = parseInt(positionText, 10);
-    const isPlacedResult = Number.isInteger(numericPosition) && numericPosition > 0;
-    if (!date || !Number.isInteger(raceNumber) || (!isPlacedResult && !nonFinishers.has(positionText.toUpperCase()))) continue;
-    const horse = stripCode(raw[6]);
-    if (!horse) continue;
-    const epoch = dateEpoch2(date);
-    if (!Number.isFinite(epoch)) continue;
-    rows.push({
-      date,
-      epoch,
-      raceNo: raceNumber,
-      raceKey: `${date}|${raceNumber}`,
-      dist: String(raw[2] || '').trim(),
-      goingCat: goingCategory2(raw[3]),
-      rank: isPlacedResult ? numericPosition : 99,
-      win: numericPosition === 1,
-      horse,
-      jockey: String(raw[7] || '').trim(),
-      trainer: String(raw[8] || '').trim(),
-      weight: parseFloat(raw[9]) || 0,
-      gate: parseInt(raw[11], 10) || 0,
-      style: styleOf.get(horse) || '不明',
-      relW: 0,
-      claim: 0,
-      jTop3: false,
-      tTop3: false,
-    });
-  }
-  rows.sort((a, b) => a.date.localeCompare(b.date) || a.raceNo - b.raceNo);
-
-  const raceWeights = new Map();
-  for (const row of rows) {
-    if (row.weight <= 0) continue;
-    if (!raceWeights.has(row.raceKey)) raceWeights.set(row.raceKey, []);
-    raceWeights.get(row.raceKey).push(row.weight);
-  }
-  const raceMedW = new Map();
-  for (const [raceKey, weights] of raceWeights) raceMedW.set(raceKey, median2(weights));
-  for (const row of rows) {
-    const medianWeight = raceMedW.get(row.raceKey) || 0;
-    row.relW = medianWeight > 0 && row.weight > 0 ? medianWeight - row.weight : 0;
-  }
-
-  const raceGroups = [];
-  for (const row of rows) {
-    let group = raceGroups[raceGroups.length - 1];
-    if (!group || group[0].raceKey !== row.raceKey) {
-      group = [];
-      raceGroups.push(group);
-    }
-    group.push(row);
-  }
-  const jockeyWins = new Map();
-  const trainerWins = new Map();
-  const jockeyHistory = new Map();
-  let activeSeason = null;
-  for (const group of raceGroups) {
-    const season = seasonOf2(group[0].date);
-    if (season !== activeSeason) {
-      jockeyWins.clear();
-      trainerWins.clear();
-      activeSeason = season;
-    }
-    const topJockeys = topThree2(jockeyWins);
-    const topTrainers = topThree2(trainerWins);
-    for (const row of group) {
-      row.jTop3 = topJockeys.has(row.jockey);
-      row.tTop3 = topTrainers.has(row.trainer);
-      row.claim = claimEstimate2(jockeyHistory.get(row.jockey) || []);
-    }
-    for (const row of group) {
-      if (row.win && row.jockey) jockeyWins.set(row.jockey, (jockeyWins.get(row.jockey) || 0) + 1);
-      if (row.win && row.trainer) trainerWins.set(row.trainer, (trainerWins.get(row.trainer) || 0) + 1);
-      if (row.jockey) {
-        if (!jockeyHistory.has(row.jockey)) jockeyHistory.set(row.jockey, []);
-        jockeyHistory.get(row.jockey).push(row);
-      }
-    }
-  }
-
-  const wins = rows.reduce((total, row) => total + (row.win ? 1 : 0), 0);
-  const rawPrior = rows.length ? wins / rows.length : 0.08;
-  const p0 = Math.max(0.000001, Math.min(0.999999, rawPrior));
-  const byHorse = new Map();
-  const byJockey = new Map();
-  const byTrainer = new Map();
-  const byHorseJockey = new Map();
-  const byJockeyTrainer = new Map();
-  for (const row of rows) {
-    pushIndex2(byHorse, row.horse, row);
-    pushIndex2(byJockey, row.jockey, row);
-    pushIndex2(byTrainer, row.trainer, row);
-    if (row.jockey) pushIndex2(byHorseJockey, `${row.horse}\u0000${row.jockey}`, row);
-    if (row.jockey && row.trainer) pushIndex2(byJockeyTrainer, `${row.jockey}\u0000${row.trainer}`, row);
-  }
-
-  const claimOf = new Map();
-  for (const [jockey, history] of jockeyHistory) claimOf.set(jockey, claimEstimate2(history));
-  IDX2 = {
-    rows, p0, byHorse, byJockey, byTrainer, byHorseJockey, byJockeyTrainer,
-    raceMedW, styleOf, claimOf, top3Cache: new Map(),
-  };
-  IDX2.woeGate = buildWoeTable2(rows, row => gateBucket2(row.gate));
-  IDX2.woeGateDist = buildWoeTable2(rows, row => {
-    const bucket = gateBucket2(row.gate);
-    return bucket ? `${distBand2(row.dist)}|${bucket}` : null;
-  }, 30);
-  IDX2.woeWeight = buildWoeTable2(rows, row =>
-    row.weight > 0 && raceMedW.has(row.raceKey) ? weightBucket2(row.relW) : null);
-  IDX2.woeClaim = buildWoeTable2(rows, row => row.jockey ? String(row.claim) : null, 30);
-  IDX2.woeStyle = buildWoeTable2(rows, row => {
-    const bucket = gateBucket2(row.gate);
-    return bucket && row.style !== '不明' ? `${row.style}|${bucket}` : null;
-  }, 30);
-  IDX2.woeJTop3 = buildWoeTable2(rows, row => row.jockey ? (row.jTop3 ? 'Y' : 'N') : null);
-  IDX2.woeTTop3 = buildWoeTable2(rows, row => row.trainer ? (row.tTop3 ? 'Y' : 'N') : null);
-}
-
-function buildPrediction2(entries, race) {
-  if (!IDX2 || !entries || entries.length < 2) return [];
-  const asOfDate = String((race && race.date) || (RACECARD && RACECARD.date) || '');
-  const distance = String((race && race.distance) || '');
-  const distanceNumber = parseInt(distance, 10) || 1200;
-  const distanceBand = distBand2(distance);
-  const goingCat = goingCategory2(race && race.going);
-  const weights = entries.map(entry => parseFloat(entry.weight)).filter(weight => Number.isFinite(weight) && weight > 0);
-  const fieldMedianWeight = median2(weights);
-  const distanceFactor = Math.max(0.8, Math.min(1.5, distanceNumber / 1400));
-  const topJockeys = currentTopThree2('jockey', asOfDate);
-  const topTrainers = currentTopThree2('trainer', asOfDate);
-
-  const scored = entries.map(entry => {
-    const horse = stripCode(entry.horse_name);
-    const jockey = String(entry.jockey || '').trim();
-    const trainer = String(entry.trainer || '').trim();
-    const history = historyBefore2(IDX2.byHorse.get(horse), asOfDate);
-    const jockeyHistory = historyBefore2(IDX2.byJockey.get(jockey), asOfDate);
-    const trainerHistory = historyBefore2(IDX2.byTrainer.get(trainer), asOfDate);
-    const horseJockeyHistory = historyBefore2(IDX2.byHorseJockey.get(`${horse}\u0000${jockey}`), asOfDate);
-    const jockeyTrainerHistory = historyBefore2(IDX2.byJockeyTrainer.get(`${jockey}\u0000${trainer}`), asOfDate);
-    const parts = [];
-    let score = 0;
-    const add = (key, value) => {
-      const factorWoe = Number.isFinite(value) ? Math.max(-A2.WOE_CLAMP, Math.min(A2.WOE_CLAMP, value)) : 0;
-      const contribution = A2.W[key] * factorWoe;
-      score += contribution;
-      parts.push({ key, contribution });
-    };
-
-    const recentForm = latestHistory2(IDX2.byHorse.get(horse), asOfDate, 5);
-    if (recentForm.length) {
-      let formPoints = 0;
-      for (const row of recentForm) {
-        formPoints += row.win ? 1 : row.rank <= 3 ? 0.6 : row.rank === 4 ? 0.3 : 0;
-      }
-      add('form', woe2(mEstimate2(formPoints, recentForm.length)));
-    }
-
-    const exactDistance = history.filter(row => row.dist === distance);
-    const distanceHistory = exactDistance.length >= A2.MIN_SAMPLE
-      ? exactDistance
-      : history.filter(row => distBand2(row.dist) === distanceBand);
-    add('dist', woeForRows2(distanceHistory));
-    add('going', woeForRows2(history.filter(row => row.goingCat === goingCat)));
-    add('jockey', recentRateWoe2(IDX2.byJockey.get(jockey), asOfDate));
-    add('trainer', recentRateWoe2(IDX2.byTrainer.get(trainer), asOfDate));
-    if (topJockeys.hasHistory) add('jTop3', IDX2.woeJTop3.get(topJockeys.names.has(jockey) ? 'Y' : 'N') || 0);
-    if (topTrainers.hasHistory) add('tTop3', IDX2.woeTTop3.get(topTrainers.names.has(trainer) ? 'Y' : 'N') || 0);
-    add('jh', woeForRows2(horseJockeyHistory));
-    add('jt', woeForRows2(jockeyTrainerHistory));
-
-    const carriedWeight = parseFloat(entry.weight);
-    if (fieldMedianWeight > 0 && Number.isFinite(carriedWeight) && carriedWeight > 0) {
-      const weightWoe = IDX2.woeWeight.get(weightBucket2(fieldMedianWeight - carriedWeight)) || 0;
-      add('weight', weightWoe * distanceFactor);
-    }
-    const claim = claimEstimate2(jockeyHistory);
-    add('claim', IDX2.woeClaim.get(String(claim)) || 0);
-
-    const gate = parseInt(entry.gate, 10) || 0;
-    const gateBucket = gateBucket2(gate);
-    if (gateBucket) {
-      const gateWoe = IDX2.woeGateDist.get(`${distanceBand}|${gateBucket}`);
-      add('gate', gateWoe === undefined ? (IDX2.woeGate.get(gateBucket) || 0) : gateWoe);
-      const style = IDX2.styleOf.get(horse) || '不明';
-      if (style !== '不明') add('style', IDX2.woeStyle.get(`${style}|${gateBucket}`) || 0);
-    }
-
-    score = Math.max(-A2.SCORE_CLAMP, Math.min(A2.SCORE_CLAMP, score));
-    const reasons = parts.filter(part => part.contribution > 0.01)
-      .sort((a, b) => b.contribution - a.contribution)
-      .slice(0, 2)
-      .map(part => REASON_LABEL2[part.key]);
-    return { entry, horse, score, reasons };
-  });
-
-  const maxScore = Math.max(...scored.map(item => item.score));
-  const exponentials = scored.map(item => Math.exp((item.score - maxScore) / A2.TEMP));
-  const total = exponentials.reduce((sum, value) => sum + value, 0) || 1;
-  scored.forEach((item, index) => { item.prob = exponentials[index] / total; });
-  return scored.sort((a, b) => b.prob - a.prob || Number(a.entry.horse_no) - Number(b.entry.horse_no));
-}
-
-/* ════════════ 預測算法3：精算信度速度模型 (Actuarial Credibility & Speed Model) ════════════ */
-const A3 = {
-  HALF_LIFE_DAYS: 120,    // 時間衰減半衰期 (120天)
-  K_HORSE: 4.0,           // 馬匹實力 Bühlmann-Straub 信度常數
-  K_JOCKEY: 18.0,         // 騎師信度常數
-  K_TRAINER: 22.0,        // 練馬師信度常數
-  K_JT: 6.0,              // 師騎組合信度常數
-  WEIGHT_COEFF: 0.045,    // 每磅負磅相對於1400米基準彈性係數
-  TEMP: 0.85,             // 多項 Logit 溫度係數
-};
-let IDX3 = null;
-
-function parseTimeSeconds3(timeStr) {
-  if (!timeStr) return null;
-  const match = String(timeStr).trim().match(/^(\d+):(\d+\.?\d*)$/);
-  if (!match) return null;
-  const sec = parseInt(match[1], 10) * 60 + parseFloat(match[2]);
+function glmParseTime(text) {
+  const m = String(text || '').trim().match(/^(\d+):(\d+\.?\d*)$/);
+  if (!m) return null;
+  const sec = parseInt(m[1], 10) * 60 + parseFloat(m[2]);
   return Number.isFinite(sec) && sec > 30 && sec < 250 ? sec : null;
 }
 
-function buildIndexes3() {
-  IDX3 = null;
-  const timeByDG = new Map();
-  const timeByD = new Map();
-
-  for (const r of D) {
-    const sec = parseTimeSeconds3(r[12]);
-    if (!sec) continue;
-    const dist = String(r[2] || '').trim();
-    const goingCat = goingCategory2(r[3]);
-    const key = dist + '|' + goingCat;
-    if (!timeByDG.has(key)) timeByDG.set(key, []);
-    timeByDG.get(key).push(sec);
-    if (!timeByD.has(dist)) timeByD.set(dist, []);
-    timeByD.get(dist).push(sec);
-  }
-
-  function computeBenchmark(list) {
-    if (!list || list.length < 3) return null;
-    const sorted = [...list].sort((a, b) => a - b);
-    const med = sorted[Math.floor(sorted.length / 2)];
-    const mean = sorted.reduce((s, x) => s + x, 0) / sorted.length;
-    const variance = sorted.reduce((s, x) => s + (x - mean) ** 2, 0) / sorted.length;
-    const std = Math.max(0.4, Math.sqrt(variance));
-    return { med, std };
-  }
-
-  const bmDG = new Map();
-  for (const [key, list] of timeByDG) {
-    const bm = computeBenchmark(list);
-    if (bm) bmDG.set(key, bm);
-  }
-  const bmD = new Map();
-  for (const [key, list] of timeByD) {
-    const bm = computeBenchmark(list);
-    if (bm) bmD.set(key, bm);
-  }
-
-  const byHorse = new Map();
-  const byJockey = new Map();
-  const byTrainer = new Map();
-  const byJT = new Map();
-
-  let winsCount = 0;
-  let placesCount = 0;
-  let totalValid = 0;
-
-  for (const r of D) {
-    const date = String(r[0] || '').trim();
-    const epoch = dateEpoch2(date);
-    if (!Number.isFinite(epoch)) continue;
-    const horse = stripCode(r[6]);
-    if (!horse) continue;
-    const jockey = String(r[7] || '').trim();
-    const trainer = String(r[8] || '').trim();
-    const dist = String(r[2] || '').trim();
-    const goingCat = goingCategory2(r[3]);
-    const rankStr = String(r[4] || '').trim();
-    const rankNum = parseInt(rankStr, 10);
-    const isFinished = Number.isInteger(rankNum) && rankNum > 0;
-    const rank = isFinished ? rankNum : 99;
-    const isWin = rank === 1;
-    const isPlace = rank >= 1 && rank <= 3;
-    totalValid += 1;
-    if (isWin) winsCount += 1;
-    if (isPlace) placesCount += 1;
-
-    const timeSec = parseTimeSeconds3(r[12]);
-    const bm = bmDG.get(dist + '|' + goingCat) || bmD.get(dist);
-    let speedFig = 0;
-    if (bm && timeSec) {
-      speedFig = Math.max(-2.5, Math.min(2.5, (bm.med - timeSec) / bm.std));
-    }
-
-    const rowObj = {
-      date, epoch, dist, goingCat, rank, isWin, isPlace,
-      speedFig, weight: parseFloat(r[9]) || 0, gate: parseInt(r[11], 10) || 0
-    };
-
-    if (!byHorse.has(horse)) byHorse.set(horse, []);
-    byHorse.get(horse).push(rowObj);
-
-    if (jockey) {
-      if (!byJockey.has(jockey)) byJockey.set(jockey, []);
-      byJockey.get(jockey).push(rowObj);
-    }
-    if (trainer) {
-      if (!byTrainer.has(trainer)) byTrainer.set(trainer, []);
-      byTrainer.get(trainer).push(rowObj);
-    }
-    if (jockey && trainer) {
-      const jtKey = jockey + '\u0000' + trainer;
-      if (!byJT.has(jtKey)) byJT.set(jtKey, []);
-      byJT.get(jtKey).push(rowObj);
-    }
-  }
-
-  const p0Win = totalValid ? winsCount / totalValid : 0.08;
-  const p0Place = totalValid ? placesCount / totalValid : 0.24;
-
-  IDX3 = {
-    byHorse, byJockey, byTrainer, byJT,
-    bmDG, bmD, p0Win, p0Place
-  };
-}
-
-function buildPrediction3(entries, race) {
-  if (!IDX3 || !entries || entries.length < 2) return [];
-  const asOfDate = String((race && race.date) || (RACECARD && RACECARD.date) || '');
-  const distance = String((race && race.distance) || '');
-  const distanceNumber = parseInt(distance, 10) || 1200;
-  const asOfEpoch = dateEpoch2(asOfDate);
-
-  const weights = entries.map(e => parseFloat(e.weight)).filter(w => Number.isFinite(w) && w > 0);
-  const sortedWeights = [...weights].sort((a, b) => a - b);
-  const medWeight = sortedWeights.length ? sortedWeights[Math.floor(sortedWeights.length / 2)] : 125;
-
-  const scored = entries.map(entry => {
-    const horse = stripCode(entry.horse_name);
-    const jockey = String(entry.jockey || '').trim();
-    const trainer = String(entry.trainer || '').trim();
-    const weight = parseFloat(entry.weight) || medWeight;
-    const gate = parseInt(entry.gate, 10) || 0;
-
-    // 1. 馬匹速度與近況 (時間指數衰減與信度加權)
-    const hAll = IDX3.byHorse.get(horse) || [];
-    const hHistory = hAll.filter(r => r.date < asOfDate);
-    let hatSpeed = 0;
-    let hatForm = 0;
-    let volPenalty = 0;
-    let distSpeedMax = -999;
-
-    if (hHistory.length) {
-      let wSum = 0;
-      let sSum = 0;
-      let fSum = 0;
-      const ranks = [];
-      for (const run of hHistory) {
-        const elapsedDays = Number.isFinite(asOfEpoch) && Number.isFinite(run.epoch)
-          ? Math.max(0, (asOfEpoch - run.epoch) / 86400000) : 180;
-        const decay = Math.exp(-elapsedDays / A3.HALF_LIFE_DAYS);
-        const distMult = (run.dist === distance) ? 1.3 : 0.8;
-        const weightFactor = decay * distMult;
-        wSum += weightFactor;
-        sSum += run.speedFig * weightFactor;
-        const formPt = run.isWin ? 1.0 : run.isPlace ? 0.6 : (run.rank <= 5 ? 0.25 : 0.0);
-        fSum += formPt * weightFactor;
-        ranks.push(run.rank);
-        if (run.dist === distance && run.speedFig > distSpeedMax) {
-          distSpeedMax = run.speedFig;
-        }
-      }
-
-      const meanSpeed = wSum > 0 ? sSum / wSum : 0;
-      const meanForm = wSum > 0 ? fSum / wSum : 0;
-      const zH = hHistory.length / (hHistory.length + A3.K_HORSE);
-      hatSpeed = zH * meanSpeed;
-      hatForm = zH * (meanForm - IDX3.p0Place);
-
-      if (ranks.length >= 3) {
-        const meanR = ranks.reduce((s, x) => s + x, 0) / ranks.length;
-        const varR = ranks.reduce((s, x) => s + (x - meanR) ** 2, 0) / ranks.length;
-        const stdR = Math.sqrt(varR);
-        volPenalty = 0.08 * Math.min(2.5, stdR / 3.5);
-      }
-    }
-
-    // 2. 騎師信度期望值
-    const jAll = IDX3.byJockey.get(jockey) || [];
-    const jHistory = jAll.filter(r => r.date < asOfDate);
-    let jScore = 0;
-    if (jHistory.length) {
-      const zJ = jHistory.length / (jHistory.length + A3.K_JOCKEY);
-      const winRate = jHistory.filter(r => r.isWin).length / jHistory.length;
-      const plcRate = jHistory.filter(r => r.isPlace).length / jHistory.length;
-      jScore = zJ * (0.6 * (plcRate - IDX3.p0Place) + 0.4 * (winRate - IDX3.p0Win));
-    }
-
-    // 3. 練馬師信度期望值
-    const tAll = IDX3.byTrainer.get(trainer) || [];
-    const tHistory = tAll.filter(r => r.date < asOfDate);
-    let tScore = 0;
-    if (tHistory.length) {
-      const zT = tHistory.length / (tHistory.length + A3.K_TRAINER);
-      const plcRate = tHistory.filter(r => r.isPlace).length / tHistory.length;
-      tScore = zT * (plcRate - IDX3.p0Place);
-    }
-
-    // 4. 騎練搭檔協同信度
-    const jtKey = jockey + '\u0000' + trainer;
-    const jtAll = IDX3.byJT.get(jtKey) || [];
-    const jtHistory = jtAll.filter(r => r.date < asOfDate);
-    let jtScore = 0;
-    if (jtHistory.length) {
-      const zJT = jtHistory.length / (jtHistory.length + A3.K_JT);
-      const winRate = jtHistory.filter(r => r.isWin).length / jtHistory.length;
-      jtScore = zJT * (winRate - IDX3.p0Win);
-    }
-
-    // 5. 負磅邊際彈性
-    const distFactor = distanceNumber / 1400;
-    const weightDelta = weight - medWeight;
-    const weightAdj = -A3.WEIGHT_COEFF * distFactor * weightDelta;
-
-    // 6. 跑道幾何與檔位優勢
-    let gateAdj = 0;
-    if (distanceNumber <= 1400) {
-      if (gate >= 1 && gate <= 3) gateAdj = 0.16;
-      else if (gate >= 4 && gate <= 6) gateAdj = 0.08;
-      else if (gate >= 7 && gate <= 9) gateAdj = -0.04;
-      else if (gate >= 10) gateAdj = -0.15;
-    } else {
-      if (gate >= 1 && gate <= 4) gateAdj = 0.08;
-      else if (gate >= 11) gateAdj = -0.08;
-    }
-
-    const utility = (
-      1.20 * hatSpeed +
-      1.10 * hatForm +
-      0.95 * jScore +
-      0.70 * tScore +
-      0.55 * jtScore +
-      weightAdj +
-      gateAdj -
-      volPenalty
-    );
-
-    // 精算理由分析
-    const reasonCandidates = [];
-    if (hatSpeed >= 0.45) reasonCandidates.push({ label: '速度指數頂尖', val: hatSpeed * 1.2 });
-    else if (hatSpeed >= 0.18) reasonCandidates.push({ label: '速度優勢', val: hatSpeed * 1.2 });
-
-    if (distSpeedMax >= 0.6) reasonCandidates.push({ label: '同程極速往績', val: 0.5 });
-    if (hatForm >= 0.15) reasonCandidates.push({ label: '近仗動量充沛', val: hatForm * 1.1 });
-    if (weightAdj >= 0.12) reasonCandidates.push({ label: '負磅優勢顯著', val: weightAdj });
-    if (gateAdj >= 0.12) reasonCandidates.push({ label: '黃金內檔幾何', val: gateAdj });
-    if (jScore >= 0.07) reasonCandidates.push({ label: '騎師高信度', val: jScore * 0.95 });
-    if (jtScore >= 0.04) reasonCandidates.push({ label: '師騎強勢組合', val: jtScore * 0.55 });
-    if (hHistory.length >= 3 && volPenalty <= 0.03) reasonCandidates.push({ label: '走勢穩健低險', val: 0.35 });
-
-    reasonCandidates.sort((a, b) => b.val - a.val);
-    let reasons = reasonCandidates.slice(0, 2).map(r => r.label);
-    if (!reasons.length) {
-      reasons = hHistory.length < 2 ? ['新出/少賽審慎'] : ['綜合評分均衡'];
-    }
-
-    return {
-      entry, horse, score: utility, reasons
-    };
-  });
-
-  const maxScore = Math.max(...scored.map(item => item.score));
-  const exps = scored.map(item => Math.exp((item.score - maxScore) / A3.TEMP));
-  const sumExp = exps.reduce((s, x) => s + x, 0) || 1;
-  scored.forEach((item, idx) => {
-    item.prob = exps[idx] / sumExp;
-  });
-
-  return scored.sort((a, b) => b.prob - a.prob || Number(a.entry.horse_no) - Number(b.entry.horse_no));
-}
-
-/* ════════════ 預測算法4：Grok4.7 玄機對弈 ════════════
-   不以獨立勝率堆分數。先把每仗完成時間換成「落後頭馬長度」，
-   扣走負磅、檔位與受阻行程，再按對手實力回推隱性評分；
-   今日則重算減磅、檔位、步速對壘與換騎，用 Plackett-Luce 排出最可能名次。
-   排位表「負磅」是分配磅，學徒減磅寫在騎師名後，實負 = 分配磅 − 減磅。 */
-const A4 = {
-  HALF_LIFE: 118,
-  PERSON_HALF: 170,
-  K_HORSE: 2.2,
-  K_JOCKEY: 18,
-  K_TRAINER: 24,
-  JOCKEY_SCALE: 8,
-  LB_PER_LB: 0.11,
-  SPEED_BLEND: 0.16,
-  W_DIST: 0.5,
-  W_JOCKEY: 0.58,
-  W_UPGRADE: 0.42,
-  W_JHOT: 0.3,
-  W_TRAINER: 0.38,
-  W_THOT: 0.45,
-  W_PACE: 0.75,
-  W_CLASS: 0.4,
-  W_LAST: 0.1,
-  W_BOUNCE: 0.3,
-  W_FORM: 2,
-  W_VOL: 1.35,
-  PLACE_MIX: 0.76,
-  DRAW_K: 42,
-  TEMP: 2.55,
-};
-const A5 = {
-  MODEL_WEIGHTS: [0.1, 0.1, 0.2, 0.6],
-  SCORE_SCALE: 24,
-  TEMP: 2.55,
-};
-let IDX4 = null;
-
-function clamp4(value, lo, hi) {
-  if (!Number.isFinite(value)) return 0;
-  return Math.max(lo, Math.min(hi, value));
-}
-
-function parseRank4(text) {
+function glmParseRank(text) {
   const raw = String(text || '').trim();
   if (!raw || raw === '---') return null;
   const upper = raw.toUpperCase();
@@ -1603,21 +839,25 @@ function parseRank4(text) {
   return null;
 }
 
-function parseRider4(raw) {
+function glmParseRider(raw) {
   const text = String(raw || '').trim();
-  const matched = text.match(/[（(]\s*-\s*(\d+)\s*[）)]/);
-  const claim = matched ? Math.min(10, parseInt(matched[1], 10) || 0) : 0;
+  const m = text.match(/[（(]\s*-\s*(\d+)\s*[）)]/);
+  const claim = m ? Math.min(10, parseInt(m[1], 10) || 0) : 0;
   const name = text.replace(/\s*[（(]\s*-\s*\d+\s*[）)]\s*/g, '').replace(/---/g, '').trim();
   return { name, claim };
 }
 
-function inferVenue4(distM) {
-  if (distM === 1650) return 'HV';
-  if (distM === 1400 || distM === 1600 || distM === 2000 || distM === 2400) return 'ST';
-  return '';
+function glmGoingCat(value) {
+  const going = String(value || '').trim();
+  if (going === '好地至快地') return '快';
+  if (going === '好地') return '好';
+  if (going === '好地至黏地' || going === '黏地') return '黏';
+  if (going === '軟地' || going === '濕快地' || going === '濕慢地') return '軟';
+  if (going === '封地') return '封';
+  return '其他';
 }
 
-function distBand4(distM) {
+function glmDistBand(distM) {
   if (distM <= 1000) return '1000';
   if (distM <= 1200) return '1200';
   if (distM <= 1400) return '1400';
@@ -1627,7 +867,7 @@ function distBand4(distM) {
   return '2200+';
 }
 
-function gateBucket4(gate) {
+function glmGateBucket(gate) {
   if (gate <= 3) return '1-3';
   if (gate <= 6) return '4-6';
   if (gate <= 9) return '7-9';
@@ -1635,7 +875,7 @@ function gateBucket4(gate) {
   return '13+';
 }
 
-function tripScore4(note) {
+function glmTripScore(note) {
   const text = String(note || '');
   let bonus = 0;
   if (/受阻|受困|未能望空|無路可上|受擠|勒避|被困/.test(text)) bonus += 1.05;
@@ -1644,10 +884,10 @@ function tripScore4(note) {
   else if (/出閘僅屬一般/.test(text)) bonus += 0.18;
   if (/失蹄|失去平衡|大力碰撞/.test(text)) bonus += 0.28;
   if (/包尾大敗/.test(text)) bonus -= 0.35;
-  return clamp4(bonus, -0.4, 2);
+  return glmClamp(bonus, -0.4, 2);
 }
 
-function styleFromNote4(note) {
+function glmStyleOf(note) {
   const text = String(note || '');
   const front = /領放|居前列|前列位置|在領放馬|帶頭/.test(text);
   const back = /在馬群之後|馬群後列|後列|居後|在後|包尾/.test(text);
@@ -1657,7 +897,13 @@ function styleFromNote4(note) {
   return null;
 }
 
-function venueDrawPrior4(venue, distM, gate) {
+function glmVenueOf(distM) {
+  if (distM === 1650) return 'HV';
+  if (distM === 1400 || distM === 1600 || distM === 2000 || distM === 2400) return 'ST';
+  return '';
+}
+
+function glmVenueDrawPrior(venue, distM, gate) {
   const code = String(venue || '').toUpperCase();
   if (!code || gate <= 0) return 0;
   if (code === 'ST' || code === 'S') {
@@ -1686,89 +932,509 @@ function venueDrawPrior4(venue, distM, gate) {
   return 0;
 }
 
-function decayedMean4(items, asOfEpoch, valueOf, weightOf) {
+function glmDecayedMean(items, asOfEpoch, valueOf, weightOf) {
   let wSum = 0;
   let vSum = 0;
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
+  for (const item of items) {
     if (!(item.epoch < asOfEpoch)) continue;
     const value = valueOf(item);
     if (!Number.isFinite(value)) continue;
     const days = Math.max(0, (asOfEpoch - item.epoch) / 86400000);
-    const w = Math.exp(-days / A4.HALF_LIFE) * (weightOf ? weightOf(item) : 1);
+    const w = Math.exp(-days / 150) * (weightOf ? weightOf(item) : 1);
     wSum += w;
     vSum += value * w;
   }
   return { mean: wSum ? vSum / wSum : 0, nEff: wSum };
 }
 
-function riderScore4(runs, asOfEpoch, p0Win, p0Place, k) {
-  let wSum = 0;
-  let winSum = 0;
-  let plcSum = 0;
-  let n = 0;
-  if (!runs) return { score: 0, n: 0 };
-  for (let i = 0; i < runs.length; i++) {
-    const run = runs[i];
-    if (!(run.epoch < asOfEpoch)) continue;
-    const days = Math.max(0, (asOfEpoch - run.epoch) / 86400000);
-    const w = Math.exp(-days / A4.PERSON_HALF);
-    wSum += w;
-    n += 1;
-    if (run.win) winSum += w;
-    if (run.place) plcSum += w;
+function buildGlmIndexes() {
+  GLM_IDX = null;
+  const raceMap = new Map();
+  const races = [];
+  for (const raw of D) {
+    const date = String(raw[0] || '').trim();
+    const epoch = glmEpoch(date);
+    const rankInfo = glmParseRank(raw[4]);
+    if (!date || !Number.isFinite(epoch) || !rankInfo || rankInfo.kind === 'scratch') continue;
+    const horse = glmStrip(raw[6]);
+    if (!horse) continue;
+    const dist = String(raw[2] || '').trim();
+    const distM = parseInt(dist, 10) || 0;
+    if (distM < 800) continue;
+    const rider = glmParseRider(raw[7]);
+    const run = {
+      date, epoch, raceNo: parseInt(raw[1], 10) || 0,
+      raceKey: date + '|' + (parseInt(raw[1], 10) || raw[1]),
+      dist, distM, going: glmGoingCat(raw[3]),
+      rank: rankInfo.kind === 'finish' ? rankInfo.rank : 99,
+      finished: rankInfo.kind === 'finish',
+      win: rankInfo.kind === 'finish' && rankInfo.rank === 1,
+      place: rankInfo.kind === 'finish' && rankInfo.rank <= 3,
+      horse,
+      jockey: rider.name,
+      trainer: String(raw[8] || '').trim(),
+      weight: parseFloat(raw[9]) || 0,
+      gate: parseInt(raw[11], 10) || 0,
+      time: glmParseTime(raw[12]),
+      trip: glmTripScore(raw[13]),
+      style: glmStyleOf(raw[13]),
+    };
+    let race = raceMap.get(run.raceKey);
+    if (!race) {
+      race = {
+        raceKey: run.raceKey, date, epoch, raceNo: run.raceNo,
+        dist, distM, goingRaw: String(raw[3] || '').trim(), members: [],
+      };
+      raceMap.set(run.raceKey, race);
+      races.push(race);
+    }
+    race.members.push(run);
   }
-  if (wSum <= 0) return { score: 0, n: 0 };
-  const z = wSum / (wSum + k);
-  const mix = Number.isFinite(A4.PLACE_MIX) ? A4.PLACE_MIX : 0.5;
-  const score = z * (mix * ((plcSum / wSum) - p0Place) + (1 - mix) * ((winSum / wSum) - p0Win)) * A4.JOCKEY_SCALE;
-  return { score, n };
-}
+  races.sort((a, b) => a.date.localeCompare(b.date) || a.raceNo - b.raceNo);
 
-function hotEdge4(runs, asOfEpoch, windowDays, minStarts) {
-  if (!runs || !runs.length) return 0;
-  let careerN = 0;
-  let careerW = 0;
-  let recentN = 0;
-  let recentW = 0;
-  const start = asOfEpoch - windowDays * 86400000;
-  for (let i = 0; i < runs.length; i++) {
-    const run = runs[i];
-    if (!(run.epoch < asOfEpoch)) continue;
-    careerN += 1;
-    if (run.win) careerW += 1;
-    if (run.epoch >= start) {
-      recentN += 1;
-      if (run.win) recentW += 1;
+  /* Online pass — ratings, par times and draw baselines are built strictly
+     from races already run, so every stored number is walk-forward safe. */
+  const rating = new Map();
+  const runCount = new Map();
+  const timesDG = new Map();
+  const timesD = new Map();
+  const drawSum = new Map();
+  let marginSum = 0;
+  let marginN = 0;
+  const parOf = list => (list && list.length >= 8) ? glmMedian(list) : null;
+
+  for (const race of races) {
+    const weights = race.members.map(m => m.weight).filter(w => w > 0);
+    const medW = weights.length ? glmMedian(weights) : 0;
+    const distFactor = Math.max(0.85, Math.min(1.75, race.distM / 1400));
+    const finishCount = race.members.filter(m => m.finished).length;
+    race.weak = finishCount < 3;
+
+    let winTime = null;
+    for (const m of race.members) {
+      if (m.rank === 1 && m.time) winTime = winTime === null ? m.time : Math.min(winTime, m.time);
+    }
+    for (const m of race.members) {
+      let lengths = 16;
+      if (m.finished) {
+        if (winTime && m.time && m.time >= winTime - 0.03) {
+          const secPerLen = 2.5 * winTime / race.distM;
+          lengths = glmClamp((m.time - winTime) / secPerLen, 0, 20);
+        } else lengths = glmClamp((m.rank - 1) * 1.2, 0, 20);
+      }
+      m.lengths = lengths;
+    }
+
+    const globalMean = marginN ? marginSum / marginN : 4;
+    for (const m of race.members) {
+      let drawBias = 0;
+      if (m.finished && m.gate >= 1) {
+        const stat = drawSum.get(glmDistBand(race.distM) + '|' + glmGateBucket(m.gate));
+        if (stat && stat.n >= 20) drawBias = glmClamp(globalMean - stat.sum / stat.n, -1.2, 1.2);
+      }
+      m.drawBias = drawBias;
+      const wPen = m.weight > 0 && medW > 0 ? (m.weight - medW) * 0.11 * distFactor : 0;
+      m.adjMargin = m.lengths + drawBias - m.trip + wPen;
+      m.weakRace = race.weak;
+    }
+
+    const rated = race.members.filter(m => m.finished);
+    let fieldAbility = 0;
+    if (rated.length) {
+      let sum = 0;
+      for (const m of rated) sum += rating.get(m.horse) || 0;
+      fieldAbility = sum / rated.length;
+    }
+    let avgAdj = 0;
+    if (rated.length) {
+      let total = 0;
+      for (const m of rated) total += m.adjMargin;
+      avgAdj = total / rated.length;
+    }
+    for (const m of race.members) {
+      m.preRating = rating.get(m.horse) || 0;
+      m.fieldAbility = fieldAbility;
+      const perf = m.finished
+        ? glmClamp(fieldAbility + (avgAdj - m.adjMargin), -12, 10)
+        : glmClamp(fieldAbility - 7.5, -12, -2);
+      m.perf = perf;
+      const n = runCount.get(m.horse) || 0;
+      const k = m.finished ? (n < 4 ? 0.4 : 0.22) : 0.12;
+      const before = rating.get(m.horse) || 0;
+      const after = before + k * (perf - before);
+      rating.set(m.horse, after);
+      m.postRating = after;
+      runCount.set(m.horse, n + 1);
+    }
+
+    for (const m of race.members) {
+      const par = parOf(timesDG.get(race.dist + '|' + m.going)) || parOf(timesD.get(race.dist));
+      if (m.finished && m.time && par) {
+        const secPerLen = 2.5 * par / race.distM;
+        const wAdv = m.weight > 0 && medW > 0 ? (medW - m.weight) * 0.11 * distFactor : 0;
+        m.speed = glmClamp((par - m.time) / secPerLen - m.drawBias + wAdv, -12, 10);
+      } else {
+        m.speed = null;
+      }
+      if (m.finished) {
+        if (m.time) {
+          const dg = race.dist + '|' + m.going;
+          if (!timesDG.has(dg)) timesDG.set(dg, []);
+          timesDG.get(dg).push(m.time);
+          if (!timesD.has(race.dist)) timesD.set(race.dist, []);
+          timesD.get(race.dist).push(m.time);
+        }
+        if (m.gate >= 1) {
+          const key = glmDistBand(race.distM) + '|' + glmGateBucket(m.gate);
+          const stat = drawSum.get(key) || { sum: 0, n: 0 };
+          stat.sum += m.lengths;
+          stat.n += 1;
+          drawSum.set(key, stat);
+          marginSum += m.lengths;
+          marginN += 1;
+        }
+      }
     }
   }
-  if (recentN < minStarts || careerN < recentN + 5) return 0;
-  return recentW / recentN - careerW / careerN;
+
+  const byHorse = new Map();
+  const byJockey = new Map();
+  const byTrainer = new Map();
+  const roster = new Map();
+  for (const race of races) {
+    roster.set(race.raceKey, race.members.map(m => ({ horse: m.horse, rank: m.rank })));
+    for (const m of race.members) {
+      if (!byHorse.has(m.horse)) byHorse.set(m.horse, []);
+      byHorse.get(m.horse).push(m);
+      if (m.jockey) {
+        if (!byJockey.has(m.jockey)) byJockey.set(m.jockey, []);
+        byJockey.get(m.jockey).push(m);
+      }
+      if (m.trainer) {
+        if (!byTrainer.has(m.trainer)) byTrainer.set(m.trainer, []);
+        byTrainer.get(m.trainer).push(m);
+      }
+    }
+  }
+  for (const runs of byHorse.values()) runs.sort((a, b) => a.date.localeCompare(b.date) || a.raceNo - b.raceNo);
+  for (const runs of byJockey.values()) runs.sort((a, b) => a.epoch - b.epoch);
+  for (const runs of byTrainer.values()) runs.sort((a, b) => a.epoch - b.epoch);
+
+  const drawAfterByDate = new Map();
+  const runningDraw = new Map();
+  let runningLengthSum = 0;
+  let runningLengthN = 0;
+  let runningDate = '';
+  const drawSnapshot = () => ({
+    mean: runningLengthN ? runningLengthSum / runningLengthN : 4,
+    stats: new Map([...runningDraw].map(([key, value]) => [key, { ...value }])),
+  });
+  for (const race of races) {
+    if (race.date !== runningDate && runningDate) drawAfterByDate.set(runningDate, drawSnapshot());
+    runningDate = race.date;
+    for (const m of race.members) {
+      if (!m.finished || m.gate < 1) continue;
+      const key = glmDistBand(race.distM) + '|' + glmGateBucket(m.gate);
+      const stat = runningDraw.get(key) || { sum: 0, n: 0 };
+      stat.sum += m.lengths;
+      stat.n += 1;
+      runningDraw.set(key, stat);
+      runningLengthSum += m.lengths;
+      runningLengthN += 1;
+    }
+  }
+  if (runningDate) drawAfterByDate.set(runningDate, drawSnapshot());
+  const drawDates = [...drawAfterByDate.keys()];
+  GLM_IDX = {
+    byHorse, byJockey, byTrainer, roster, races,
+    drawBiasOf: (key, asOfDate) => {
+      let low = 0;
+      let high = drawDates.length;
+      while (low < high) {
+        const middle = (low + high) >> 1;
+        if (drawDates[middle] < asOfDate) low = middle + 1;
+        else high = middle;
+      }
+      if (low === 0) return 0;
+      const snapshot = drawAfterByDate.get(drawDates[low - 1]);
+      const stat = snapshot.stats.get(key);
+      if (!stat || stat.n < 20 || !snapshot.mean) return 0;
+      return glmClamp(snapshot.mean - stat.sum / stat.n, -1.2, 1.2);
+    },
+  };
 }
 
-function plProbs4(utilities, temperature = A4.TEMP) {
-  const maxU = Math.max.apply(null, utilities);
-  const s = utilities.map(u => Math.exp(((Number.isFinite(u) ? u : 0) - maxU) / temperature));
-  const total = s.reduce((sum, value) => sum + value, 0) || 1;
+function buildGlmFeatures(entries, race) {
+  if (!GLM_IDX || !entries || entries.length < 2) return null;
+  const asOfDate = String((race && race.date) || (RACECARD && RACECARD.date) || '');
+  const asOfEpoch = glmEpoch(asOfDate);
+  const epochCut = Number.isFinite(asOfEpoch) ? asOfEpoch : Infinity;
+  const distance = String((race && race.distance) || '');
+  const distM = parseInt(distance, 10) || 1200;
+  const going = glmGoingCat(race && race.going);
+  const venue = String((race && race.venue) || (RACECARD && RACECARD.venue) || glmVenueOf(distM) || '').toUpperCase();
+  const distFactor = Math.max(0.85, Math.min(1.75, distM / 1400));
+  const rivals = new Set(entries.map(e => glmStrip(e.horse_name)).filter(Boolean));
+
+  const carriedOf = e => {
+    const rider = glmParseRider(e.jockey);
+    const allocated = parseFloat(e.weight);
+    return { rider, carried: Number.isFinite(allocated) ? allocated - rider.claim : NaN };
+  };
+  const carriedList = entries.map(e => carriedOf(e).carried).filter(w => Number.isFinite(w) && w > 0);
+  const fieldMed = carriedList.length ? glmMedian(carriedList) : 0;
+  let priorWins = 0;
+  let priorPlaces = 0;
+  let priorFinishers = 0;
+  for (const priorRace of GLM_IDX.races) {
+    if (priorRace.date >= asOfDate) break;
+    for (const runner of priorRace.members) {
+      if (!runner.finished) continue;
+      priorFinishers += 1;
+      if (runner.win) priorWins += 1;
+      if (runner.place) priorPlaces += 1;
+    }
+  }
+  const p0Win = priorFinishers ? priorWins / priorFinishers : 0.08;
+  const p0Place = priorFinishers ? priorPlaces / priorFinishers : 0.24;
+
+  const riderCache = new Map();
+  const trainerCache = new Map();
+  const personScore = (name, kind) => {
+    if (!name) return 0;
+    const cache = kind === 'jockey' ? riderCache : trainerCache;
+    if (cache.has(name)) return cache.get(name);
+    const runs = (kind === 'jockey' ? GLM_IDX.byJockey : GLM_IDX.byTrainer).get(name) || [];
+    let score = 0;
+    const hist = runs.filter(r => r.epoch < epochCut);
+    if (hist.length) {
+      let wSum = 0, winSum = 0, plcSum = 0;
+      for (const r of hist) {
+        const days = Math.max(0, (epochCut - r.epoch) / 86400000);
+        const w = Math.exp(-days / 170);
+        wSum += w;
+        if (r.win) winSum += w;
+        if (r.place) plcSum += w;
+      }
+      if (wSum > 0) {
+        const z = wSum / (wSum + (kind === 'jockey' ? 18 : 22));
+        score = z * (0.6 * (plcSum / wSum - p0Place) + 0.4 * (winSum / wSum - p0Win)) * 8;
+      }
+    }
+    cache.set(name, score);
+    return score;
+  };
+  const hotEdge = (runs, windowDays, minStarts) => {
+    const hist = (runs || []).filter(r => r.epoch < epochCut);
+    if (!hist.length) return 0;
+    let careerN = 0, careerW = 0, recentN = 0, recentW = 0;
+    const start = epochCut - windowDays * 86400000;
+    for (const r of hist) {
+      careerN += 1;
+      if (r.win) careerW += 1;
+      if (r.epoch >= start) {
+        recentN += 1;
+        if (r.win) recentW += 1;
+      }
+    }
+    if (recentN < minStarts || careerN < recentN + 5) return 0;
+    return recentW / recentN - careerW / careerN;
+  };
+
+  const ctx = entries.map(entry => {
+    const horse = glmStrip(entry.horse_name);
+    const rider = glmParseRider(entry.jockey);
+    const trainer = String(entry.trainer || '').trim();
+    const gate = parseInt(entry.gate, 10) || 0;
+    const carried = carriedOf(entry).carried;
+    const history = (GLM_IDX.byHorse.get(horse) || []).filter(r => r.epoch < epochCut);
+
+    const margin = glmDecayedMean(history, epochCut, r => r.postRating, r => r.weakRace ? 0.45 : 1);
+    const speed = glmDecayedMean(history, epochCut, r => r.speed, r => r.weakRace ? 0.45 : 1);
+    const z = margin.nEff / (margin.nEff + 4);
+    const speedMean = speed.nEff >= 0.8 ? speed.mean : margin.mean;
+    const ability = z * (0.8 * margin.mean + 0.2 * speedMean);
+
+    const exact = history.filter(r => r.dist === distance);
+    const near = exact.length >= 2 ? exact : history.filter(r => Math.abs(r.distM - distM) <= 200);
+    const distStats = glmDecayedMean(near, epochCut, r => r.postRating, r => (r.weakRace ? 0.45 : 1) * (r.dist === distance ? 1 : 0.62));
+    const zD = distStats.nEff / (distStats.nEff + 2.2);
+    const distEdge = glmClamp(zD * (distStats.mean - margin.mean), -1.4, 1.4);
+
+    let formW = 0, formSum = 0;
+    for (const r of history.slice(-6)) {
+      if (!r.finished) continue;
+      const days = Math.max(0, (epochCut - r.epoch) / 86400000);
+      const w = Math.exp(-days / 118) * (r.dist === distance ? 1.28 : 1);
+      const pt = r.rank === 1 ? 1 : r.rank <= 3 ? 0.66 : r.rank <= 5 ? 0.3 : r.rank <= 7 ? 0.08 : 0;
+      formW += w;
+      formSum += pt * w;
+    }
+    const formPts = formW ? formSum / formW : 0.3;
+
+    const trend = history.length >= 3
+      ? glmClamp((history[history.length - 1].postRating - history[history.length - 3].postRating) * 0.08, -0.3, 0.32) : 0;
+
+    let volPen = 0;
+    if (history.length >= 4) {
+      const recent = history.slice(-8);
+      const mean = recent.reduce((s, r) => s + r.postRating, 0) / recent.length;
+      const variance = recent.reduce((s, r) => s + (r.postRating - mean) ** 2, 0) / recent.length;
+      volPen = Math.min(0.45, Math.sqrt(variance) * 0.045);
+    }
+
+    const last = history.length ? history[history.length - 1] : null;
+    const daysSince = last ? Math.max(0, (epochCut - last.epoch) / 86400000) : NaN;
+    const bounce = last && last.trip >= 0.85 && last.rank >= 4 && last.rank <= 11 && daysSince <= 75
+      ? Math.min(0.8, last.trip * 0.3) : 0;
+
+    const weightAdj = fieldMed > 0 && Number.isFinite(carried) ? (fieldMed - carried) * 0.11 * distFactor : 0;
+
+    const drawKey = gate >= 1 ? glmDistBand(distM) + '|' + glmGateBucket(gate) : null;
+    const drawAdj = drawKey
+      ? glmClamp(GLM_IDX.drawBiasOf(drawKey, asOfDate) * 0.85 + glmVenueDrawPrior(venue, distM, gate) * 0.62, -0.7, 0.6)
+      : 0;
+
+    const jockeyScore = personScore(rider.name, 'jockey');
+    const trainerScore = personScore(trainer, 'trainer');
+
+    const sameRider = history.filter(r => r.jockey && r.jockey === rider.name);
+    let combo = 0;
+    if (sameRider.length) {
+      const comboWins = sameRider.filter(r => r.win).length;
+      if (comboWins >= 1) combo = 0.26 + Math.min(0.22, (comboWins - 1) * 0.07);
+      else if (sameRider.length >= 4) combo = -0.16;
+    }
+
+    const seen = new Set();
+    const usualScores = [];
+    for (let i = history.length - 1; i >= 0 && usualScores.length < 4; i--) {
+      const name = history[i].jockey;
+      if (!name || seen.has(name)) continue;
+      seen.add(name);
+      usualScores.push(personScore(name, 'jockey'));
+    }
+    const usual = usualScores.length ? usualScores.reduce((s, v) => s + v, 0) / usualScores.length : 0;
+    const upgrade = history.length ? jockeyScore - usual : 0;
+
+    const jHot = glmClamp(hotEdge(GLM_IDX.byJockey.get(rider.name), 60, 12) * 4.5, -0.4, 0.42);
+    const tHot = glmClamp(hotEdge(GLM_IDX.byTrainer.get(trainer), 45, 8) * 4.2, -0.35, 0.38);
+
+    let h2h = 0;
+    for (let i = Math.max(0, history.length - 10); i < history.length; i++) {
+      const r = history[i];
+      const field = GLM_IDX.roster.get(r.raceKey);
+      if (!field) continue;
+      const daysAgo = Math.max(0, (epochCut - r.epoch) / 86400000);
+      if (daysAgo > 420) continue;
+      for (const other of field) {
+        if (other.horse === horse || !rivals.has(other.horse)) continue;
+        const beat = r.rank < other.rank ? 1 : r.rank > other.rank ? 0 : 0.5;
+        h2h += (beat - 0.5) * 0.5 * Math.exp(-daysAgo / 200) * (r.dist === distance ? 1 : 0.7);
+      }
+    }
+    h2h = glmClamp(h2h, -0.75, 0.75);
+
+    let goingAdj = 0;
+    if (going && going !== '其他') {
+      const goingRuns = history.filter(r => r.going === going);
+      if (goingRuns.length >= 2) {
+        const gMean = goingRuns.reduce((s, r) => s + r.postRating, 0) / goingRuns.length;
+        goingAdj = glmClamp((gMean - margin.mean) * 0.3, -0.35, 0.35);
+      }
+    }
+
+    let styleW = 0, styleSum = 0, styleN = 0;
+    for (const r of history) {
+      if (r.style === null) continue;
+      const days = Math.max(0, (epochCut - r.epoch) / 86400000);
+      const w = Math.exp(-days / 160);
+      styleW += w;
+      styleSum += r.style * w;
+      styleN += 1;
+    }
+    const style = styleW ? styleSum / styleW : null;
+
+    const speedFig = speed.nEff >= 0.8 ? speed.mean : 0;
+
+    return {
+      entry, horse, gate, style, styleN,
+      ability, distEdge, formPts, trend, volPen,
+      daysSince, bounce, weightAdj, drawAdj,
+      jockeyScore, trainerScore, combo, upgrade, jHot, tHot,
+      h2h, goingAdj, speedFig,
+      nEff: margin.nEff, last,
+    };
+  });
+
+  const knownRaw = ctx.filter(c => c.nEff >= 1.2);
+  const todayClass = knownRaw.length ? knownRaw.reduce((s, c) => s + c.ability, 0) / knownRaw.length : 0;
+  const knownStyle = ctx.filter(c => c.styleN >= 2 && c.style !== null).length;
+  const paceOn = knownStyle >= Math.min(4, Math.ceil(ctx.length * 0.35));
+  const frontCount = paceOn ? ctx.filter(c => c.styleN >= 2 && c.style >= 0.5).length : 0;
+  const neutralPace = distM >= 1800 ? 1.6 : distM >= 1400 ? 2 : 2.3;
+
+  return ctx.map(c => {
+    const styleConf = c.style === null ? 0 : Math.min(1, c.styleN / 4);
+    let paceAdj = 0;
+    if (paceOn && styleConf > 0) {
+      paceAdj = styleConf * (frontCount - neutralPace) * (-0.3 * c.style);
+      if (distM <= 1200 && c.gate >= 11 && c.style > 0.4) paceAdj -= 0.32 * styleConf;
+      if (distM <= 1200 && c.gate <= 3 && c.style > 0.4) paceAdj += 0.18 * styleConf;
+      if (distM >= 1600 && c.style < -0.4 && frontCount >= 3) paceAdj += 0.12 * styleConf;
+      paceAdj = glmClamp(paceAdj, -0.8, 0.8) * 0.75;
+    }
+    const classAdj = c.last && !c.last.weakRace && Number.isFinite(c.daysSince) && c.daysSince <= 120 && c.nEff >= 1.4
+      ? glmClamp((c.last.fieldAbility - todayClass) * 0.4, -1, 1) : 0;
+    const gateSprint = distM <= 1400 && c.gate >= 1 && c.gate <= 4 ? 1 : 0;
+    return [
+      c.ability,          // 0 實力評分
+      c.distEdge,         // 1 同程優勢
+      c.formPts,          // 2 近仗入位
+      c.trend,            // 3 狀態趨勢
+      c.volPen,           // 4 發揮波動
+      Number.isFinite(c.daysSince) ? Math.log1p(Math.min(400, c.daysSince)) : Math.log1p(400), // 5 復出週期
+      c.bounce,           // 6 上仗受阻
+      c.weightAdj,        // 7 負磅輕盈
+      c.drawAdj,          // 8 檔位有利
+      c.jockeyScore,      // 9 騎師質素
+      c.trainerScore,     // 10 練馬師質素
+      c.combo,            // 11 人馬合拍
+      c.upgrade,          // 12 換騎升級
+      c.jHot,             // 13 騎師手熱
+      c.tHot,             // 14 練馬師熱
+      c.h2h,              // 15 對頭馬佔優
+      c.goingAdj,         // 16 場地合拍
+      paceAdj,            // 17 步速對路
+      classAdj,           // 18 對手轉弱
+      c.speedFig,         // 19 速度指數
+      gateSprint,         // 20 內檔短途
+    ];
+  });
+}
+
+function glmPlProbs(utilities) {
+  const safe = utilities.map(u => (Number.isFinite(u) ? u : 0));
+  const maxU = Math.max(...safe);
+  const s = safe.map(u => Math.exp(u - maxU));
+  const total = s.reduce((sum, v) => sum + v, 0) || 1;
   const n = s.length;
-  const win = s.map(value => value / total);
+  const win = s.map(v => v / total);
   const place = new Array(n).fill(0);
   if (n < 3) {
-    for (let i = 0; i < n; i++) place[i] = 1;
+    place.fill(1);
     return { win, place };
   }
   for (let i = 0; i < n; i++) {
-    const p1 = s[i] / total;
     const rest1 = total - s[i];
     if (rest1 <= 0) continue;
     for (let j = 0; j < n; j++) {
       if (j === i) continue;
-      const p2 = s[j] / rest1;
       const rest2 = rest1 - s[j];
       if (rest2 <= 0) continue;
       for (let k = 0; k < n; k++) {
         if (k === i || k === j) continue;
-        const p = p1 * p2 * (s[k] / rest2);
+        const p = (s[i] / total) * (s[j] / rest1) * (s[k] / rest2);
         place[i] += p;
         place[j] += p;
         place[k] += p;
@@ -1778,823 +1444,22 @@ function plProbs4(utilities, temperature = A4.TEMP) {
   return { win, place };
 }
 
-function buildIndexes4() {
-  IDX4 = null;
-  const byHorse = new Map();
-  const byJockey = new Map();
-  const byTrainer = new Map();
-  const roster = new Map();
-  const raceMap = new Map();
-  const races = [];
-  const timesDG = new Map();
-  const timesD = new Map();
-  let wins = 0;
-  let places = 0;
-  let finishers = 0;
-
-  const pushRun = (map, key, row) => {
-    if (!key) return;
-    if (!map.has(key)) map.set(key, []);
-    map.get(key).push(row);
-  };
-
-  for (let i = 0; i < D.length; i++) {
-    const raw = D[i];
-    const date = String(raw[0] || '').trim();
-    const epoch = dateEpoch2(date);
-    const rankInfo = parseRank4(raw[4]);
-    if (!date || !Number.isFinite(epoch) || !rankInfo || rankInfo.kind === 'scratch') continue;
-    const horse = stripCode(raw[6]);
-    if (!horse) continue;
-    const dist = String(raw[2] || '').trim();
-    const distM = parseInt(dist, 10) || 0;
-    if (distM < 800) continue;
-    const jockey = parseRider4(raw[7]).name;
-    const trainer = String(raw[8] || '').trim();
-    const weight = parseFloat(raw[9]);
-    const gate = parseInt(raw[11], 10);
-    const finished = rankInfo.kind === 'finish';
-    const rank = finished ? rankInfo.rank : 99;
-    const run = {
-      date, epoch, raceNo: parseInt(raw[1], 10) || 0,
-      raceKey: date + '|' + String(parseInt(raw[1], 10) || raw[1]),
-      dist, distM, goingCat: goingCategory2(raw[3]),
-      rank, finished, win: rank === 1, place: rank >= 1 && rank <= 3,
-      horse, jockey, trainer,
-      weight: Number.isFinite(weight) ? weight : 0,
-      gate: Number.isInteger(gate) ? gate : 0,
-      time: parseTimeSeconds3(raw[12]),
-      trip: tripScore4(raw[13]),
-      style: styleFromNote4(raw[13]),
-      lengths: finished ? null : 16,
-      effLen: 16, speed: null, pr: -6, fieldAbility: 0, weakRace: false,
-    };
-    let race = raceMap.get(run.raceKey);
-    if (!race) {
-      race = { raceKey: run.raceKey, date, epoch, raceNo: run.raceNo, dist, distM, members: [] };
-      raceMap.set(run.raceKey, race);
-      races.push(race);
-    }
-    race.members.push(run);
-    pushRun(byHorse, horse, run);
-    if (jockey) pushRun(byJockey, jockey, run);
-    if (trainer) pushRun(byTrainer, trainer, run);
-    if (finished) {
-      finishers += 1;
-      if (run.win) wins += 1;
-      if (run.place) places += 1;
-      if (run.time) {
-        const dg = dist + '|' + run.goingCat;
-        if (!timesDG.has(dg)) timesDG.set(dg, []);
-        timesDG.get(dg).push(run.time);
-        if (!timesD.has(dist)) timesD.set(dist, []);
-        timesD.get(dist).push(run.time);
-      }
-    }
-  }
-
-  races.sort((a, b) => a.date.localeCompare(b.date) || a.raceNo - b.raceNo);
-  for (const runs of byHorse.values()) runs.sort((a, b) => a.date.localeCompare(b.date) || a.raceNo - b.raceNo);
-  for (const runs of byJockey.values()) runs.sort((a, b) => a.epoch - b.epoch);
-  for (const runs of byTrainer.values()) runs.sort((a, b) => a.epoch - b.epoch);
-
-  const drawSum = new Map();
-  let lenSum = 0;
-  let lenN = 0;
-  for (const race of races) {
-    let winTime = null;
-    const weights = [];
-    for (const run of race.members) {
-      if (run.rank === 1 && run.time) winTime = winTime === null ? run.time : Math.min(winTime, run.time);
-      if (run.weight > 0) weights.push(run.weight);
-    }
-    race.winTime = winTime;
-    race.medW = weights.length ? median2(weights) : 0;
-    const distFactor = Math.max(0.85, Math.min(1.75, race.distM / 1400));
-    for (const run of race.members) {
-      let lengths = 16;
-      if (run.finished) {
-        if (winTime && run.time && run.time >= winTime - 0.03) {
-          const secPerLen = 2.5 * winTime / race.distM;
-          lengths = clamp4((run.time - winTime) / secPerLen, 0, 20);
-        } else lengths = clamp4((run.rank - 1) * 1.2, 0, 20);
-      }
-      run.lengths = lengths;
-      if (run.finished && run.gate >= 1) {
-        const key = distBand4(race.distM) + '|' + gateBucket4(run.gate);
-        const stat = drawSum.get(key) || { sum: 0, n: 0 };
-        stat.sum += lengths;
-        stat.n += 1;
-        drawSum.set(key, stat);
-        lenSum += lengths;
-        lenN += 1;
-      }
-      const wPen = run.weight > 0 && race.medW > 0 ? (run.weight - race.medW) * A4.LB_PER_LB * distFactor : 0;
-      run._wPen = wPen;
-      run._distFactor = distFactor;
-    }
-  }
-
-  const globalMean = lenN ? lenSum / lenN : 4;
-  const draw = new Map();
-  for (const [key, stat] of drawSum) {
-    draw.set(key, { effect: globalMean - stat.sum / stat.n, n: stat.n });
-  }
-
-  const parOf = list => {
-    if (!list || list.length < 8) return null;
-    const sorted = list.slice().sort((a, b) => a - b);
-    return sorted[Math.floor(sorted.length / 2)];
-  };
-  const parDG = new Map();
-  const parD = new Map();
-  for (const [key, list] of timesDG) {
-    const med = parOf(list);
-    if (med) parDG.set(key, med);
-  }
-  for (const [key, list] of timesD) {
-    const med = parOf(list);
-    if (med) parD.set(key, med);
-  }
-
-  for (const race of races) {
-    const finishCount = race.members.filter(run => run.finished).length;
-    race.weak = finishCount < 3;
-    for (const run of race.members) {
-      const bucket = run.gate >= 1 ? draw.get(distBand4(race.distM) + '|' + gateBucket4(run.gate)) : null;
-      const drawEffect = bucket ? bucket.effect : 0;
-      run.effLen = run.lengths - run.trip + run._wPen + drawEffect;
-      run.weakRace = race.weak;
-      const par = parDG.get(race.dist + '|' + run.goingCat) || parD.get(race.dist);
-      if (run.finished && run.time && par) {
-        const secPerLen = 2.5 * par / race.distM;
-        run.speed = clamp4((par - run.time) / secPerLen + run._wPen - drawEffect, -12, 10);
-      }
-      if (race.weak) {
-        run.pr = run.finished ? clamp4(1.4 - (run.rank - 1) * 0.62, -8, 2.4) : -6;
-      }
-    }
-    roster.set(race.raceKey, race.members.map(member => ({ horse: member.horse, rank: member.rank })));
-  }
-
-  const endEpoch = races.reduce((max, race) => Math.max(max, race.epoch), 0) + 86400000;
-  let ratings = new Map();
-  for (let pass = 0; pass < 3; pass++) {
-    for (const race of races) {
-      if (race.weak) continue;
-      const rated = race.members.filter(run => run.finished);
-      if (rated.length < 3) continue;
-      let abilitySum = 0;
-      for (const run of rated) abilitySum += ratings.get(run.horse) || 0;
-      const fieldAbility = abilitySum / rated.length;
-      let lenTotal = 0;
-      for (const run of rated) lenTotal += run.effLen;
-      const avgEff = lenTotal / rated.length;
-      for (const run of rated) {
-        run.pr = clamp4(fieldAbility + (avgEff - run.effLen), -12, 10);
-        run.fieldAbility = fieldAbility;
-      }
-      for (const run of race.members) {
-        if (run.finished) continue;
-        run.pr = clamp4(fieldAbility - 7.5, -12, -2);
-        run.fieldAbility = fieldAbility;
-      }
-    }
-    ratings = new Map();
-    for (const [horse, runs] of byHorse) {
-      const stats = decayedMean4(runs, endEpoch, run => run.pr, run => run.weakRace ? 0.45 : 1);
-      ratings.set(horse, stats.mean);
-    }
-  }
-
-  IDX4 = {
-    byHorse, byJockey, byTrainer, roster, draw,
-    p0Win: finishers ? wins / finishers : 0.08,
-    p0Place: finishers ? places / finishers : 0.25,
-  };
-}
-
-function buildPrediction4(entries, race) {
-  if (!IDX4 || !entries || entries.length < 2) return [];
-  const asOfDate = String((race && race.date) || (RACECARD && RACECARD.date) || '');
-  const asOfEpoch = dateEpoch2(asOfDate);
-  const epochCut = Number.isFinite(asOfEpoch) ? asOfEpoch : Infinity;
-  const distance = String((race && race.distance) || '');
-  const distM = parseInt(distance, 10) || 1200;
-  const goingCat = goingCategory2(race && race.going);
-  const venue = String((race && race.venue) || (RACECARD && RACECARD.venue) || inferVenue4(distM) || '').toUpperCase();
-  const distFactor = Math.max(0.85, Math.min(1.75, distM / 1400));
-  const rivals = new Set(entries.map(entry => stripCode(entry.horse_name)).filter(Boolean));
-
-  const carriedOf = entry => {
-    const rider = parseRider4(entry.jockey);
-    const allocated = parseFloat(entry.weight);
-    return {
-      rider,
-      carried: Number.isFinite(allocated) ? allocated - rider.claim : NaN,
-    };
-  };
-  const carriedWeights = entries.map(entry => carriedOf(entry).carried).filter(weight => Number.isFinite(weight) && weight > 0);
-  const fieldMed = carriedWeights.length ? median2(carriedWeights) : 0;
-  const riderCache = new Map();
-  const trainerCache = new Map();
-  const cachedRider = name => {
-    if (!name) return { score: 0, n: 0 };
-    if (riderCache.has(name)) return riderCache.get(name);
-    const score = riderScore4(IDX4.byJockey.get(name), epochCut, IDX4.p0Win, IDX4.p0Place, A4.K_JOCKEY);
-    riderCache.set(name, score);
-    return score;
-  };
-  const cachedTrainer = name => {
-    if (!name) return { score: 0, n: 0 };
-    if (trainerCache.has(name)) return trainerCache.get(name);
-    const score = riderScore4(IDX4.byTrainer.get(name), epochCut, IDX4.p0Win, IDX4.p0Place, A4.K_TRAINER);
-    trainerCache.set(name, score);
-    return score;
-  };
-
-  const ctx = entries.map(entry => {
-    const horse = stripCode(entry.horse_name);
-    const rider = parseRider4(entry.jockey);
-    const trainer = String(entry.trainer || '').trim();
-    const gate = parseInt(entry.gate, 10) || 0;
-    const carried = carriedOf(entry).carried;
-    const history = (IDX4.byHorse.get(horse) || []).filter(run => run.epoch < epochCut);
-    const margin = decayedMean4(history, epochCut, run => run.pr, run => run.weakRace ? 0.45 : 1);
-    const speed = decayedMean4(history, epochCut, run => run.speed, run => run.weakRace ? 0.45 : 1);
-    const z = margin.nEff / (margin.nEff + A4.K_HORSE);
-    const speedMean = speed.nEff >= 0.8 ? speed.mean : margin.mean;
-    const blended = (1 - A4.SPEED_BLEND) * margin.mean + A4.SPEED_BLEND * speedMean;
-    const ability = z * blended;
-    const raw = blended;
-    const exact = history.filter(run => run.dist === distance);
-    const near = exact.length >= 2 ? exact : history.filter(run => Math.abs(run.distM - distM) <= 200);
-    const distStats = decayedMean4(near, epochCut, run => run.pr, run => (run.weakRace ? 0.45 : 1) * (run.dist === distance ? 1 : 0.62));
-    const zD = distStats.nEff / (distStats.nEff + 2.2);
-    const distEdge = clamp4(zD * (distStats.mean - margin.mean), -1.4, 1.4);
-
-    let styleW = 0;
-    let styleSum = 0;
-    let styleN = 0;
-    for (const run of history) {
-      if (run.style === null) continue;
-      const days = Math.max(0, (epochCut - run.epoch) / 86400000);
-      const w = Math.exp(-days / 160);
-      styleW += w;
-      styleSum += run.style * w;
-      styleN += 1;
-    }
-    const style = styleW ? styleSum / styleW : null;
-    const last = history.length ? history[history.length - 1] : null;
-    const daysSince = last ? Math.max(0, (epochCut - last.epoch) / 86400000) : NaN;
-    let freshAdj = 0;
-    if (last) {
-      if (daysSince < 11) freshAdj = -0.28;
-      else if (daysSince <= 24) freshAdj = 0.26;
-      else if (daysSince <= 42) freshAdj = 0.12;
-      else if (daysSince <= 75) freshAdj = 0.03;
-      else if (daysSince <= 130) freshAdj = -0.1;
-      else if (daysSince <= 210) freshAdj = -0.28;
-      else freshAdj = -0.5;
-    }
-    const bounce = last && last.trip >= 0.85 && last.rank >= 4 && last.rank <= 11 && daysSince <= 75
-      ? Math.min(0.8, last.trip * A4.W_BOUNCE) : 0;
-    let trend = 0;
-    if (history.length >= 3) {
-      const a = history[history.length - 3].pr;
-      const b = history[history.length - 1].pr;
-      trend = clamp4((b - a) * 0.08, -0.3, 0.32);
-    }
-    const lastEdge = last ? clamp4((last.pr - blended) * A4.W_LAST, -0.28, 0.32) : 0;
-    let formW = 0;
-    let formSum = 0;
-    const formRuns = history.slice(-6);
-    for (let i = 0; i < formRuns.length; i++) {
-      const run = formRuns[i];
-      if (!run.finished) continue;
-      const days = Math.max(0, (epochCut - run.epoch) / 86400000);
-      const distW = run.dist === distance ? 1.28 : 1;
-      const w = Math.exp(-days / A4.HALF_LIFE) * distW;
-      const pt = run.rank === 1 ? 1 : run.rank <= 3 ? 0.66 : run.rank <= 5 ? 0.3 : run.rank <= 7 ? 0.08 : 0;
-      formW += w;
-      formSum += pt * w;
-    }
-    const formAdj = formW ? ((formSum / formW) - 0.3) * (A4.W_FORM || 0) : 0;
-    let volPenalty = 0;
-    if (history.length >= 4) {
-      const recent = history.slice(-8);
-      const mean = recent.reduce((sum, run) => sum + run.pr, 0) / recent.length;
-      const variance = recent.reduce((sum, run) => sum + (run.pr - mean) ** 2, 0) / recent.length;
-      volPenalty = Math.min(0.45, Math.sqrt(variance) * 0.045) * (A4.W_VOL || 1);
-    }
-    let goingAdj = 0;
-    if (goingCat && goingCat !== '其他') {
-      const goingRuns = history.filter(run => run.goingCat === goingCat);
-      if (goingRuns.length >= 2) {
-        const gMean = goingRuns.reduce((sum, run) => sum + run.pr, 0) / goingRuns.length;
-        goingAdj = clamp4((gMean - margin.mean) * 0.3, -0.35, 0.35);
-      }
-    }
-    let h2h = 0;
-    for (let i = Math.max(0, history.length - 10); i < history.length; i++) {
-      const run = history[i];
-      const field = IDX4.roster.get(run.raceKey);
-      if (!field) continue;
-      const daysAgo = Math.max(0, (epochCut - run.epoch) / 86400000);
-      if (daysAgo > 420) continue;
-      for (const other of field) {
-        if (other.horse === horse || !rivals.has(other.horse)) continue;
-        const beat = run.rank < other.rank ? 1 : run.rank > other.rank ? 0 : 0.5;
-        const w = Math.exp(-daysAgo / 200) * (run.dist === distance ? 1 : 0.7);
-        h2h += (beat - 0.5) * 0.5 * w;
-      }
-    }
-    h2h = clamp4(h2h, -0.75, 0.75);
-    const sameRider = history.filter(run => run.jockey && run.jockey === rider.name);
-    let combo = 0;
-    if (sameRider.length) {
-      const comboWins = sameRider.filter(run => run.win).length;
-      if (comboWins >= 1) combo = 0.26 + Math.min(0.22, (comboWins - 1) * 0.07);
-      else if (sameRider.length >= 4) combo = -0.16;
-    }
-    let distChange = 0;
-    if (last && style !== null && Math.abs(last.distM - distM) >= 200) {
-      const step = distM - last.distM;
-      if (step >= 200 && style < -0.25) distChange = 0.24;
-      else if (step >= 200 && style > 0.45) distChange = -0.2;
-      else if (step <= -200 && style > 0.35) distChange = 0.14;
-    }
-    const jockeyNow = cachedRider(rider.name);
-    const trainerNow = cachedTrainer(trainer);
-    const seen = new Set();
-    const usualScores = [];
-    for (let i = history.length - 1; i >= 0 && usualScores.length < 4; i--) {
-      const name = history[i].jockey;
-      if (!name || seen.has(name)) continue;
-      seen.add(name);
-      usualScores.push(cachedRider(name).score);
-    }
-    const usual = usualScores.length ? usualScores.reduce((sum, value) => sum + value, 0) / usualScores.length : 0;
-    const upgrade = history.length ? jockeyNow.score - usual : 0;
-    const jHot = clamp4(hotEdge4(IDX4.byJockey.get(rider.name), epochCut, 60, 12) * 4.5, -0.4, 0.42);
-    const tHot = clamp4(hotEdge4(IDX4.byTrainer.get(trainer), epochCut, 45, 8) * 4.2, -0.35, 0.38);
-    const weightAdj = fieldMed > 0 && Number.isFinite(carried)
-      ? (fieldMed - carried) * A4.LB_PER_LB * distFactor : 0;
-    const bucket = gate >= 1 ? IDX4.draw.get(distBand4(distM) + '|' + gateBucket4(gate)) : null;
-    const zDraw = bucket ? bucket.n / (bucket.n + A4.DRAW_K) : 0;
-    const drawAdj = clamp4((zDraw * (bucket ? bucket.effect : 0)) * 0.85 + venueDrawPrior4(venue, distM, gate) * 0.62, -0.7, 0.6);
-
-    return {
-      entry, horse, rider, trainer, gate, ability, raw, nEff: margin.nEff, z, style, styleN,
-      distEdge, freshAdj, bounce, trend, lastEdge, formAdj, volPenalty, goingAdj, h2h, combo,
-      distChange, jockeyNow, trainerNow, upgrade, jHot, tHot, weightAdj, drawAdj, last, daysSince,
-    };
-  });
-
-  const todayField = ctx.reduce((sum, item) => sum + item.ability, 0) / ctx.length;
-  const knownRaw = ctx.filter(item => item.nEff >= 1.2);
-  const todayClass = knownRaw.length
-    ? knownRaw.reduce((sum, item) => sum + item.raw, 0) / knownRaw.length : 0;
-  const knownStyle = ctx.filter(item => item.styleN >= 2 && item.style !== null).length;
-  const paceOn = knownStyle >= Math.min(4, Math.ceil(ctx.length * 0.35));
-  const frontCount = paceOn ? ctx.filter(item => item.styleN >= 2 && item.style >= 0.5).length : 0;
-  const neutralPace = distM >= 1800 ? 1.6 : distM >= 1400 ? 2 : 2.3;
-
-  const scored = ctx.map(item => {
-    const styleConf = item.style === null ? 0 : Math.min(1, item.styleN / 4);
-    let paceAdj = 0;
-    if (paceOn && styleConf > 0) {
-      paceAdj = styleConf * (frontCount - neutralPace) * (-0.3 * item.style);
-      if (distM <= 1200 && item.gate >= 11 && item.style > 0.4) paceAdj -= 0.32 * styleConf;
-      if (distM <= 1200 && item.gate <= 3 && item.style > 0.4) paceAdj += 0.18 * styleConf;
-      if (distM >= 1600 && item.style < -0.4 && frontCount >= 3) paceAdj += 0.12 * styleConf;
-      paceAdj = clamp4(paceAdj, -0.8, 0.8) * A4.W_PACE;
-    }
-    const classAdj = item.last && !item.last.weakRace && item.daysSince <= 120 && item.nEff >= 1.4
-      ? clamp4((item.last.fieldAbility - todayClass) * A4.W_CLASS, -1, 1) : 0;
-    const known = item.nEff / (item.nEff + 1.6);
-    const jockeyTerm = item.jockeyNow.score * A4.W_JOCKEY;
-    const upgradeTerm = clamp4(item.upgrade, -0.85, 0.9) * A4.W_UPGRADE;
-    const trainerTerm = item.trainerNow.score * A4.W_TRAINER * (1.35 - 0.7 * known);
-    const utility = clamp4(
-      item.ability +
-      item.distEdge * A4.W_DIST +
-      jockeyTerm + upgradeTerm + item.jHot * A4.W_JHOT +
-      trainerTerm + item.tHot * A4.W_THOT +
-      item.weightAdj + item.drawAdj + paceAdj + item.freshAdj + item.bounce +
-      classAdj + item.h2h + item.trend + item.lastEdge + item.formAdj + item.combo +
-      item.goingAdj + item.distChange - item.volPenalty,
-      -8, 8);
-
-    const reasonRows = [];
-    const pushReason = (label, value) => { if (value >= 0.16) reasonRows.push({ label, value }); };
-    pushReason('隱性評分領先', item.ability - todayField);
-    pushReason('近仗入位穩', item.formAdj);
-    pushReason('同程評分更高', item.distEdge * A4.W_DIST);
-    pushReason('騎師優勢', jockeyTerm);
-    pushReason('換騎升級', upgradeTerm);
-    pushReason('騎師手風順', item.jHot * A4.W_JHOT);
-    pushReason('練馬師近態熱', item.tHot * A4.W_THOT);
-    pushReason('減磅實惠', item.rider.claim >= 5 ? Math.max(item.weightAdj, item.rider.claim * 0.08) : 0);
-    pushReason('負磅輕盈', item.rider.claim >= 5 ? 0 : item.weightAdj);
-    pushReason('檔位有利', item.drawAdj);
-    pushReason('步速對路', paceAdj);
-    pushReason('上仗受阻可反彈', item.bounce);
-    pushReason('休賽週期理想', item.freshAdj);
-    pushReason('對手轉弱', classAdj);
-    pushReason('對頭馬佔優', item.h2h);
-    pushReason('人馬合拍', item.combo);
-    pushReason('場地合拍', item.goingAdj);
-    pushReason('路程更合腳程', item.distChange);
-    reasonRows.sort((a, b) => b.value - a.value);
-    const reasons = reasonRows.slice(0, 2).map(row => row.label);
-    if (!reasons.length) reasons.push(item.nEff < 1 ? '初出無往績' : '綜合對壘均衡');
-    return {
-      entry: item.entry, horse: item.horse, score: utility, reasons,
-      ability: item.ability, nEff: item.nEff,
-    };
-  });
-
-  const probs = plProbs4(scored.map(item => item.score));
-  scored.forEach((item, index) => {
-    item.prob = probs.win[index];
-    item.placeProb = Math.max(0, Math.min(1, probs.place[index]));
-  });
-  scored.sort((a, b) => b.prob - a.prob || Number(a.entry.horse_no) - Number(b.entry.horse_no));
-
-  let paceText = '步速資料不足 · 以實力與檔位為主';
-  if (paceOn) {
-    if (frontCount >= neutralPace + 1.4) paceText = `快步速對壘（${frontCount}匹前領）· 後上馬受惠`;
-    else if (frontCount + 0.2 <= neutralPace - 1.3) {
-      paceText = frontCount === 0
-        ? '慢步速對壘（未見明確領放）· 能搶放者受惠'
-        : `慢步速對壘（前領${frontCount}匹）· 領放馬受惠`;
-    }
-    else paceText = `均速對壘（${frontCount}匹前領）· 位距與檔位決勝負`;
-  }
-  const gap = scored.length > 4 ? scored[3].score - scored[4].score : 0.6;
-  const conf = gap >= 0.45 ? '高' : gap >= 0.18 ? '中' : '低';
-  const top = scored[0];
-  const second = scored[1];
-  const no1 = top.entry ? top.entry.horse_no : '';
-  const no2 = second && second.entry ? second.entry.horse_no : '';
-  const topName = String(top.horse || '').replace(/[<>&]/g, '');
-  const thin = top.nEff < 1.2 ? ' · 首選往績少已折扣' : '';
-  scored.insight = `${paceText} · 頭四信心${conf} · 對壘 ${no1} 對 ${no2} · 首選 ${no1} ${topName}（勝率 ${(top.prob * 100).toFixed(1)}% · 入位 ${(top.placeProb * 100).toFixed(0)}%）${thin}`;
-  return scored;
-}
-
-function modelCountText5(count) {
-  if (count === 2) return '雙';
-  return ['零', '一', '', '三', '四'][count] || String(count);
-}
-
-function buildPrediction5(entries, modelPredictions) {
-  if (!entries || entries.length < 2 || !Array.isArray(modelPredictions)) return [];
-  const models = modelPredictions.map((prediction, index) => {
-    const ranks = new Map();
-    if (Array.isArray(prediction)) {
-      prediction.forEach((item, rankIndex) => {
-        const horseNo = String(item.entry && item.entry.horse_no || '');
-        if (horseNo && !ranks.has(horseNo)) ranks.set(horseNo, rankIndex + 1);
-      });
-    }
-    return { weight: A5.MODEL_WEIGHTS[index] || 0, ranks };
-  }).filter(model => model.weight > 0 && model.ranks.size > 1);
-  const totalWeight = models.reduce((sum, model) => sum + model.weight, 0);
-  if (!totalWeight) return [];
-
-  const scored = entries.map(entry => {
-    const horseNo = String(entry.horse_no || '');
-    let score = 0;
-    let weightedRank = 0;
-    let topFourCount = 0;
-    let topPickCount = 0;
-    let bestRank = entries.length + 1;
-    for (const model of models) {
-      const rank = model.ranks.get(horseNo) || entries.length + 1;
-      score += model.weight / (rank + 3);
-      weightedRank += model.weight * rank;
-      if (rank <= 4) topFourCount += 1;
-      if (rank === 1) topPickCount += 1;
-      bestRank = Math.min(bestRank, rank);
-    }
-    score /= totalWeight;
-    weightedRank /= totalWeight;
-    const support = topFourCount === models.length ? `${modelCountText5(models.length)}模共識`
-      : topFourCount >= 3 ? `${modelCountText5(topFourCount)}模支持`
-      : topFourCount === 2 ? '雙模支持'
-      : topFourCount === 1 ? '單模入圍'
-      : '互補排名';
-    const secondReason = topPickCount >= 2
-      ? `${topPickCount}模首選`
-      : `加權榜位 ${weightedRank.toFixed(1)}`;
-    return {
-      entry,
-      horse: stripCode(entry.horse_name),
-      score,
-      weightedRank,
-      topFourCount,
-      topPickCount,
-      modelCount: models.length,
-      bestRank,
-      reasons: [support, secondReason],
-    };
-  });
-
-  const meanScore = scored.reduce((sum, item) => sum + item.score, 0) / scored.length;
-  const probabilities = plProbs4(
-    scored.map(item => (item.score - meanScore) * A5.SCORE_SCALE),
-    A5.TEMP
-  );
-  scored.forEach((item, index) => {
-    item.prob = probabilities.win[index];
-    item.placeProb = Math.max(0, Math.min(1, probabilities.place[index]));
-  });
-  scored.sort((a, b) => b.prob - a.prob || Number(a.entry.horse_no) - Number(b.entry.horse_no));
-
-  const top = scored[0];
-  const topSupport = top.topFourCount === top.modelCount ? `${modelCountText5(top.modelCount)}模共識`
-    : `${top.topFourCount}/${top.modelCount} 模型前四支持`;
-  const topName = String(top.horse || '').replace(/[<>&]/g, '');
-  const weightText = A5.MODEL_WEIGHTS.map(weight => `${Math.round(weight * 100)}%`).join(' / ');
-  scored.insight = `四模型反向榜位融合（${weightText}）· ${topSupport} · 首選 ${top.entry.horse_no} ${topName}（勝率 ${(top.prob * 100).toFixed(1)}% · 入位 ${(top.placeProb * 100).toFixed(0)}%）`;
-  return scored;
-}
-
-/* ════════════ 預測算法6：Deepseek Flash4.1 萃衡 ════════════
-   薈萃五模、權衡輕重。以五個模型輸出的「場內標準化值」為特徵，
-   用條件 Plackett-Luce 對數似然做梯度訓練（688 場走步回測、L2 正則），
-   學出各模型在不同場面的相對可信度，再以學得權重輸出勝出與入位機率。
-   權重為離線學習結果；特徵計算方式與訓練時完全一致。 */
-const A6 = {
-  COEF: [0.1572, 0.0449, 0.0236, 0.2018, -0.0088],
-  TEMP: 0.75,
-  LABELS: ['加權評分', '貝氏機率', '精算速度', '玄機對弈', '月衡融合'],
-};
-
-function zScores6(values) {
-  const valid = values.filter(value => Number.isFinite(value));
-  const mean = valid.length ? valid.reduce((sum, value) => sum + value, 0) / valid.length : 0;
-  const variance = valid.length ? valid.reduce((sum, value) => sum + (value - mean) ** 2, 0) / valid.length : 0;
-  const sd = Math.sqrt(variance);
-  return { mean, sd: sd > 1e-6 ? sd : 0 };
-}
-
-function modelValue6(prediction, entry) {
-  if (!Array.isArray(prediction)) return NaN;
-  const item = prediction.find(row => String(row.entry && row.entry.horse_no || '') === String(entry.horse_no));
-  if (!item) return NaN;
-  return Number.isFinite(item.prob) ? item.prob : (Number.isFinite(item.score) ? item.score : NaN);
-}
-
-function buildPrediction6(entries, modelPredictions) {
-  if (!entries || entries.length < 2 || !Array.isArray(modelPredictions)) return [];
-  const columns = A6.COEF.length;
-  const raw = entries.map(entry => modelPredictions.slice(0, columns).map(prediction => modelValue6(prediction, entry)));
-  const stats = [];
-  for (let column = 0; column < columns; column++) {
-    stats.push(zScores6(raw.map(row => row[column])));
-  }
-  const scored = entries.map((entry, index) => {
-    const z = raw[index].map((value, column) => {
-      const { mean, sd } = stats[column];
-      return sd > 0 && Number.isFinite(value) ? (value - mean) / sd : 0;
-    });
-    const contributions = z.map((value, column) => value * A6.COEF[column]);
-    const score = contributions.reduce((sum, value) => sum + value, 0);
-    const ranked = contributions.map((value, column) => ({ value, column })).sort((a, b) => b.value - a.value);
-    const reasons = ranked.filter(row => row.value >= 0.05).slice(0, 2).map(row => `${A6.LABELS[row.column]}支持`);
-    if (!reasons.length) reasons.push('五模型綜合均衡');
-    return { entry, horse: stripCode(entry.horse_name), score, contributions, reasons };
-  });
-  const probs = plProbs4(scored.map(item => item.score), A6.TEMP);
-  scored.forEach((item, index) => {
-    item.prob = probs.win[index];
-    item.placeProb = Math.max(0, Math.min(1, probs.place[index]));
-  });
-  scored.sort((a, b) => b.prob - a.prob || Number(a.entry.horse_no) - Number(b.entry.horse_no));
-  const top = scored[0];
-  const topName = String(top.horse || '').replace(/[<>&]/g, '');
-  const lead = top.contributions
-    .map((value, column) => ({ value, column }))
-    .sort((a, b) => b.value - a.value)[0];
-  scored.insight = `五模型梯度集成（萃衡權重）· 主要訊號：${lead ? A6.LABELS[lead.column] : '—'} · 首選 ${top.entry.horse_no} ${topName}（勝率 ${(top.prob * 100).toFixed(1)}% · 入位 ${(top.placeProb * 100).toFixed(0)}%）`;
-  return scored;
-}
-
-/* ════════════ 預測算法7：GLM 5.3 Flash 格物致知 ════════════
-   格物：不借用任何預測模型的輸出，直接由原始賽果推導每駒 22 項特徵
-   （對手調整實力、同程邊際、近仗、趨勢、穩定度、負磅、檔位、騎練、
-   步速、對頭馬、場地、級數等）；致知：以條件 Plackett-Luce 對數似然
-   配 L2 正則，在走步回測上離線梯度學習權重，再以校準溫度輸出
-   勝出與入位機率。特徵計算與訓練時完全一致。 */
-const A7 = {
-  BETA: [0.1395, 0.0488, 0.1004, 0.1648, 0.0942, 0.0445, 0.0213, -0.0199, 0.0017, 0.014, 0.204, 0.1873, 0.0476, 0.0058, 0.0656, -0.0258, 0.0758, 0.1523, 0.0164, -0.0531, 0.0618, 0.0534],
-  TEMP: 0.6,
-  LABELS: [
-    '實力評分', '場內評分', '同程優勢', '近仗入位', '上仗走位', '狀態趨勢',
-    '發揮波動', '復出週期', '上仗受阻', '負磅輕盈', '檔位有利', '騎師質素',
-    '練馬師質素', '人馬合拍', '換騎升級', '騎師手熱', '練馬師熱', '對頭馬佔優',
-    '步速對路', '場地合拍', '對手轉弱', '內檔短途',
-  ],
-};
-
-function buildFeatures7(entries, race) {
-  if (!IDX4 || !entries || entries.length < 2) return null;
-  const asOfDate = String((race && race.date) || (RACECARD && RACECARD.date) || '');
-  const asOfEpoch = dateEpoch2(asOfDate);
-  const epochCut = Number.isFinite(asOfEpoch) ? asOfEpoch : Infinity;
-  const distance = String((race && race.distance) || '');
-  const distM = parseInt(distance, 10) || 1200;
-  const goingCat = goingCategory2(race && race.going);
-  const venue = String((race && race.venue) || (RACECARD && RACECARD.venue) || inferVenue4(distM) || '').toUpperCase();
-  const distFactor = Math.max(0.85, Math.min(1.75, distM / 1400));
-  const rivals = new Set(entries.map(entry => stripCode(entry.horse_name)).filter(Boolean));
-
-  const carriedOf = entry => {
-    const rider = parseRider4(entry.jockey);
-    const allocated = parseFloat(entry.weight);
-    return { rider, carried: Number.isFinite(allocated) ? allocated - rider.claim : NaN };
-  };
-  const carriedWeights = entries.map(entry => carriedOf(entry).carried).filter(weight => Number.isFinite(weight) && weight > 0);
-  const fieldMed = carriedWeights.length ? median2(carriedWeights) : 0;
-  const riderCache = new Map();
-  const trainerCache = new Map();
-  const cachedRider = name => {
-    if (!name) return { score: 0, n: 0 };
-    if (riderCache.has(name)) return riderCache.get(name);
-    const score = riderScore4(IDX4.byJockey.get(name), epochCut, IDX4.p0Win, IDX4.p0Place, A4.K_JOCKEY);
-    riderCache.set(name, score);
-    return score;
-  };
-  const cachedTrainer = name => {
-    if (!name) return { score: 0, n: 0 };
-    if (trainerCache.has(name)) return trainerCache.get(name);
-    const score = riderScore4(IDX4.byTrainer.get(name), epochCut, IDX4.p0Win, IDX4.p0Place, A4.K_TRAINER);
-    trainerCache.set(name, score);
-    return score;
-  };
-
-  const ctx = entries.map(entry => {
-    const horse = stripCode(entry.horse_name);
-    const rider = parseRider4(entry.jockey);
-    const trainer = String(entry.trainer || '').trim();
-    const gate = parseInt(entry.gate, 10) || 0;
-    const carried = carriedOf(entry).carried;
-    const history = (IDX4.byHorse.get(horse) || []).filter(run => run.epoch < epochCut);
-    const margin = decayedMean4(history, epochCut, run => run.pr, run => run.weakRace ? 0.45 : 1);
-    const speed = decayedMean4(history, epochCut, run => run.speed, run => run.weakRace ? 0.45 : 1);
-    const z = margin.nEff / (margin.nEff + A4.K_HORSE);
-    const speedMean = speed.nEff >= 0.8 ? speed.mean : margin.mean;
-    const blended = (1 - A4.SPEED_BLEND) * margin.mean + A4.SPEED_BLEND * speedMean;
-    const ability = z * blended;
-    const exact = history.filter(run => run.dist === distance);
-    const near = exact.length >= 2 ? exact : history.filter(run => Math.abs(run.distM - distM) <= 200);
-    const distStats = decayedMean4(near, epochCut, run => run.pr, run => (run.weakRace ? 0.45 : 1) * (run.dist === distance ? 1 : 0.62));
-    const zD = distStats.nEff / (distStats.nEff + 2.2);
-    const distEdge = clamp4(zD * (distStats.mean - margin.mean), -1.4, 1.4);
-
-    let styleW = 0;
-    let styleSum = 0;
-    let styleN = 0;
-    for (const run of history) {
-      if (run.style === null) continue;
-      const days = Math.max(0, (epochCut - run.epoch) / 86400000);
-      const w = Math.exp(-days / 160);
-      styleW += w;
-      styleSum += run.style * w;
-      styleN += 1;
-    }
-    const style = styleW ? styleSum / styleW : null;
-    const last = history.length ? history[history.length - 1] : null;
-    const daysSince = last ? Math.max(0, (epochCut - last.epoch) / 86400000) : NaN;
-    const bounce = last && last.trip >= 0.85 && last.rank >= 4 && last.rank <= 11 && daysSince <= 75
-      ? Math.min(0.8, last.trip * A4.W_BOUNCE) : 0;
-    let trend = 0;
-    if (history.length >= 3) {
-      trend = clamp4((history[history.length - 1].pr - history[history.length - 3].pr) * 0.08, -0.3, 0.32);
-    }
-    const lastEdge = last ? clamp4((last.pr - blended) * A4.W_LAST, -0.28, 0.32) : 0;
-    let formW = 0;
-    let formSum = 0;
-    for (const run of history.slice(-6)) {
-      if (!run.finished) continue;
-      const days = Math.max(0, (epochCut - run.epoch) / 86400000);
-      const w = Math.exp(-days / A4.HALF_LIFE) * (run.dist === distance ? 1.28 : 1);
-      const pt = run.rank === 1 ? 1 : run.rank <= 3 ? 0.66 : run.rank <= 5 ? 0.3 : run.rank <= 7 ? 0.08 : 0;
-      formW += w;
-      formSum += pt * w;
-    }
-    const formPts = formW ? formSum / formW : 0.3;
-    let volPen = 0;
-    if (history.length >= 4) {
-      const recent = history.slice(-8);
-      const mean = recent.reduce((sum, run) => sum + run.pr, 0) / recent.length;
-      const variance = recent.reduce((sum, run) => sum + (run.pr - mean) ** 2, 0) / recent.length;
-      volPen = Math.min(0.45, Math.sqrt(variance) * 0.045);
-    }
-    let goingAdj = 0;
-    if (goingCat && goingCat !== '其他') {
-      const goingRuns = history.filter(run => run.goingCat === goingCat);
-      if (goingRuns.length >= 2) {
-        const gMean = goingRuns.reduce((sum, run) => sum + run.pr, 0) / goingRuns.length;
-        goingAdj = clamp4((gMean - margin.mean) * 0.3, -0.35, 0.35);
-      }
-    }
-    let h2h = 0;
-    for (let i = Math.max(0, history.length - 10); i < history.length; i++) {
-      const run = history[i];
-      const field = IDX4.roster.get(run.raceKey);
-      if (!field) continue;
-      const daysAgo = Math.max(0, (epochCut - run.epoch) / 86400000);
-      if (daysAgo > 420) continue;
-      for (const other of field) {
-        if (other.horse === horse || !rivals.has(other.horse)) continue;
-        const beat = run.rank < other.rank ? 1 : run.rank > other.rank ? 0 : 0.5;
-        h2h += (beat - 0.5) * 0.5 * Math.exp(-daysAgo / 200) * (run.dist === distance ? 1 : 0.7);
-      }
-    }
-    h2h = clamp4(h2h, -0.75, 0.75);
-    const sameRider = history.filter(run => run.jockey && run.jockey === rider.name);
-    let combo = 0;
-    if (sameRider.length) {
-      const comboWins = sameRider.filter(run => run.win).length;
-      if (comboWins >= 1) combo = 0.26 + Math.min(0.22, (comboWins - 1) * 0.07);
-      else if (sameRider.length >= 4) combo = -0.16;
-    }
-    const jockeyNow = cachedRider(rider.name);
-    const trainerNow = cachedTrainer(trainer);
-    const seen = new Set();
-    const usualScores = [];
-    for (let i = history.length - 1; i >= 0 && usualScores.length < 4; i--) {
-      const name = history[i].jockey;
-      if (!name || seen.has(name)) continue;
-      seen.add(name);
-      usualScores.push(cachedRider(name).score);
-    }
-    const usual = usualScores.length ? usualScores.reduce((sum, value) => sum + value, 0) / usualScores.length : 0;
-    const upgrade = history.length ? jockeyNow.score - usual : 0;
-    const jHot = clamp4(hotEdge4(IDX4.byJockey.get(rider.name), epochCut, 60, 12) * 4.5, -0.4, 0.42);
-    const tHot = clamp4(hotEdge4(IDX4.byTrainer.get(trainer), epochCut, 45, 8) * 4.2, -0.35, 0.38);
-    const weightAdj = fieldMed > 0 && Number.isFinite(carried) ? (fieldMed - carried) * A4.LB_PER_LB * distFactor : 0;
-    const bucket = gate >= 1 ? IDX4.draw.get(distBand4(distM) + '|' + gateBucket4(gate)) : null;
-    const zDraw = bucket ? bucket.n / (bucket.n + A4.DRAW_K) : 0;
-    const drawAdj = clamp4((zDraw * (bucket ? bucket.effect : 0)) * 0.85 + venueDrawPrior4(venue, distM, gate) * 0.62, -0.7, 0.6);
-
-    return {
-      entry, horse, rider, trainer, gate, ability, blended, distEdge, formPts,
-      lastEdge, trend, volPen, daysSince, bounce, weightAdj, drawAdj,
-      jockeyScore: jockeyNow.score, trainerScore: trainerNow.score,
-      combo, upgrade, jHot, tHot, h2h, goingAdj, style, styleN,
-      nEff: margin.nEff, last,
-    };
-  });
-
-  const knownRaw = ctx.filter(item => item.nEff >= 1.2);
-  const todayClass = knownRaw.length
-    ? knownRaw.reduce((sum, item) => sum + item.blended, 0) / knownRaw.length : 0;
-  const knownStyle = ctx.filter(item => item.styleN >= 2 && item.style !== null).length;
-  const paceOn = knownStyle >= Math.min(4, Math.ceil(ctx.length * 0.35));
-  const frontCount = paceOn ? ctx.filter(item => item.styleN >= 2 && item.style >= 0.5).length : 0;
-  const neutralPace = distM >= 1800 ? 1.6 : distM >= 1400 ? 2 : 2.3;
-
-  return ctx.map(item => {
-    const styleConf = item.style === null ? 0 : Math.min(1, item.styleN / 4);
-    let paceAdj = 0;
-    if (paceOn && styleConf > 0) {
-      paceAdj = styleConf * (frontCount - neutralPace) * (-0.3 * item.style);
-      if (distM <= 1200 && item.gate >= 11 && item.style > 0.4) paceAdj -= 0.32 * styleConf;
-      if (distM <= 1200 && item.gate <= 3 && item.style > 0.4) paceAdj += 0.18 * styleConf;
-      if (distM >= 1600 && item.style < -0.4 && frontCount >= 3) paceAdj += 0.12 * styleConf;
-      paceAdj = clamp4(paceAdj, -0.8, 0.8) * A4.W_PACE;
-    }
-    const classAdj = item.last && !item.last.weakRace && item.daysSince <= 120 && item.nEff >= 1.4
-      ? clamp4((item.last.fieldAbility - todayClass) * A4.W_CLASS, -1, 1) : 0;
-    const gateSprint = distM <= 1400 && item.gate >= 1 && item.gate <= 4 ? 1 : 0;
-    return [
-      item.ability, item.blended, item.distEdge, item.formPts, item.lastEdge, item.trend,
-      item.volPen, Number.isFinite(item.daysSince) ? Math.log1p(Math.min(400, item.daysSince)) : Math.log1p(400),
-      item.bounce, item.weightAdj, item.drawAdj, item.jockeyScore, item.trainerScore,
-      item.combo, item.upgrade, item.jHot, item.tHot, item.h2h, paceAdj, item.goingAdj,
-      classAdj, gateSprint,
-    ];
-  });
-}
-
-function buildPrediction7(entries, race) {
-  const features = buildFeatures7(entries, race);
-  if (!features) return [];
-  const dim = A7.BETA.length;
+function buildGlmPrediction(entries, race) {
+  const features = buildGlmFeatures(entries, race);
+  if (!features || features.length < 2) return [];
   const scored = features.map((row, index) => {
-    const contributions = row.map((value, c) => (Number.isFinite(value) ? value : 0) * A7.BETA[c]);
-    const score = contributions.reduce((sum, value) => sum + value, 0);
+    const contributions = row.map((value, c) => {
+      const raw = Number.isFinite(value) ? value : GLM.MEAN[c];
+      const sd = GLM.STD[c] > 1e-9 ? GLM.STD[c] : 1;
+      return ((raw - GLM.MEAN[c]) / sd) * GLM.BETA[c];
+    });
+    const score = contributions.reduce((sum, v) => sum + v, 0);
     const ranked = contributions.map((value, c) => ({ value, c })).sort((a, b) => b.value - a.value);
-    const reasons = ranked.filter(row => row.value >= 0.08).slice(0, 2).map(row => A7.LABELS[row.c]);
-    if (!reasons.length) reasons.push('綜合格物均衡');
-    return { entry: entries[index], horse: stripCode(entries[index].horse_name), score, contributions, reasons };
+    const reasons = ranked.filter(r => r.value >= 0.05).slice(0, 2).map(r => GLM.LABELS[r.c]);
+    if (!reasons.length) reasons.push('綜合洞燭均衡');
+    return { entry: entries[index], horse: glmStrip(entries[index].horse_name), score, contributions, reasons };
   });
-  const probs = plProbs4(scored.map(item => item.score), A7.TEMP);
+  const probs = glmPlProbs(scored.map(item => item.score));
   scored.forEach((item, index) => {
     item.prob = probs.win[index];
     item.placeProb = Math.max(0, Math.min(1, probs.place[index]));
@@ -2603,9 +1468,10 @@ function buildPrediction7(entries, race) {
   const top = scored[0];
   const topName = String(top.horse || '').replace(/[<>&]/g, '');
   const lead = top.contributions.map((value, c) => ({ value, c })).sort((a, b) => b.value - a.value)[0];
-  scored.insight = `格物致知 · 22維特徵學得權重 · 主要訊號：${lead ? A7.LABELS[lead.c] : '—'} · 首選 ${top.entry.horse_no} ${topName}（勝率 ${(top.prob * 100).toFixed(1)}% · 入位 ${(top.placeProb * 100).toFixed(0)}%）`;
+  scored.insight = `洞燭先機 · 21維在線評分特徵 · 主要訊號：${lead && lead.value >= 0.05 ? GLM.LABELS[lead.c] : '—'} · 首選 ${top.entry.horse_no} ${topName}（勝率 ${(top.prob * 100).toFixed(1)}% · 入位 ${(top.placeProb * 100).toFixed(0)}%）`;
   return scored;
 }
+/* ═══ GLM 5.3 洞燭先機 — model core end ═══ */
 
 /* ── Render race strip (mobile) ─────────────────── */
 function renderRaceStrip() {
@@ -2745,206 +1611,19 @@ function renderDetail() {
       <div class="pred-grid">${slots}</div>
     </details>`;
   })();
-  const preds2 = buildPrediction2(race.entries || [], race);
-  const algorithm1Top4 = new Set(preds.slice(0, 4).map(item => String(item.entry && item.entry.horse_no || '')));
-  const pred2HTML = preds2.length < 2 ? '' : (() => {
-    const slots = preds2.slice(0, 4).map((item, index) => {
-      const probability = item.prob * 100;
-      const pct = `${probability.toFixed(1)}%`;
-      const horseNo = item.entry ? String(item.entry.horse_no) : '';
-      const horseName = item.entry ? stripCode(item.entry.horse_name) : item.horse;
-      const common = algorithm1Top4.has(horseNo) ? '<span class="pred-badge-common">兼中</span>' : '';
-      const actual = RACECARD.demo && item.entry
-        ? `<div class="pred-actual">${actualRankLabel2(item.entry)}</div>` : '';
-      return `<div class="pred-slot ${sCls[index]}">
-        <div class="pred-rank">${medals[index]} 第${index + 1}位${common}</div>
-        <div class="pred-horse">${horseNo} · ${horseName}</div>
-        <div class="pred-bar-wrap">
-          <div class="pred-bar-bg"><div class="pred-bar" style="width:${Math.min(100, Math.max(0, probability))}%"></div></div>
-          <span class="pred-pct">${pct}</span>
-        </div>
-        <div class="pred-reason">${item.reasons.length ? item.reasons.join(' · ') : '資料不足'}</div>
-        ${actual}
-      </div>`;
-    }).join('');
-    const order = preds2.slice(0, 4).map(item => item.entry ? item.entry.horse_no : '').filter(Boolean).join('-');
-    return `<details class="pred-box pred-box-a2 pred-panel" open>
-      <summary class="pred-title">
-        <span class="pred-heading-label">Kimi3 貝氏機率模型</span>
-        <span class="pred-order" aria-label="預測第1至第4名">${order}</span>
-      </summary>
-      <div class="pred-grid">${slots}</div>
-    </details>`;
-  })();
-  const preds3 = buildPrediction3(race.entries || [], race);
-  const pred3HTML = preds3.length < 2 ? '' : (() => {
-    const slots = preds3.slice(0, 4).map((item, index) => {
-      const probability = item.prob * 100;
-      const pct = `${probability.toFixed(1)}%`;
-      const horseNo = item.entry ? String(item.entry.horse_no) : '';
-      const horseName = item.entry ? stripCode(item.entry.horse_name) : item.horse;
-      const actual = RACECARD.demo && item.entry
-        ? `<div class="pred-actual">${actualRankLabel2(item.entry)}</div>` : '';
-      return `<div class="pred-slot ${sCls[index]}">
-        <div class="pred-rank">${medals[index]} 第${index + 1}位</div>
-        <div class="pred-horse">${horseNo} · ${horseName}</div>
-        <div class="pred-bar-wrap">
-          <div class="pred-bar-bg"><div class="pred-bar" style="width:${Math.min(100, Math.max(0, probability))}%"></div></div>
-          <span class="pred-pct">${pct}</span>
-        </div>
-        <div class="pred-reason">${item.reasons.length ? item.reasons.join(' · ') : '資料不足'}</div>
-        ${actual}
-      </div>`;
-    }).join('');
-    const order = preds3.slice(0, 4).map(item => item.entry ? item.entry.horse_no : '').filter(Boolean).join('-');
-    return `<details class="pred-box pred-box-a3 pred-panel" open>
-      <summary class="pred-title">
-        <span class="pred-heading-label">Gemini3.8 精算信度速度模型</span>
-        <span class="pred-order" aria-label="預測第1至第4名">${order}</span>
-      </summary>
-      <div class="pred-grid">${slots}</div>
-    </details>`;
-  })();
-  let preds4 = [];
+  let glmPreds = [];
   try {
-    preds4 = buildPrediction4(race.entries || [], race) || [];
+    glmPreds = buildGlmPrediction(race.entries || [], race) || [];
   } catch (e) {
-    console.warn('算法4預測失敗', e);
-    preds4 = [];
+    console.warn('GLM 5.3 洞燭先機預測失敗', e);
+    glmPreds = [];
   }
-  const topSets4 = {
-    a1: new Set(preds.slice(0, 4).map(item => String(item.entry && item.entry.horse_no || ''))),
-    a2: new Set(preds2.slice(0, 4).map(item => String(item.entry && item.entry.horse_no || ''))),
-    a3: new Set(preds3.slice(0, 4).map(item => String(item.entry && item.entry.horse_no || ''))),
-  };
-  const pred4HTML = preds4.length < 2 ? '' : (() => {
-    const mark = horseNo => {
-      let n = 0;
-      if (topSets4.a1.has(horseNo)) n += 1;
-      if (topSets4.a2.has(horseNo)) n += 1;
-      if (topSets4.a3.has(horseNo)) n += 1;
-      if (n >= 3) return '<span class="pred-badge-all">三模共識</span>';
-      if (n === 2) return '<span class="pred-badge-common">雙模共識</span>';
-      if (n === 1) return '<span class="pred-badge-common">兼中</span>';
-      return '<span class="pred-badge-unique">獨到</span>';
-    };
-    const slots = preds4.slice(0, 4).map((item, index) => {
-      const probability = item.prob * 100;
-      const pct = `${probability.toFixed(1)}%`;
-      const horseNo = item.entry ? String(item.entry.horse_no) : '';
-      const horseName = item.entry ? stripCode(item.entry.horse_name) : item.horse;
-      const place = Number.isFinite(item.placeProb) ? `入位 ${(item.placeProb * 100).toFixed(0)}%` : '';
-      const reasonBody = item.reasons && item.reasons.length ? item.reasons.join(' · ') : '資料不足';
-      const actual = RACECARD.demo && item.entry
-        ? `<div class="pred-actual">${actualRankLabel2(item.entry)}</div>` : '';
-      return `<div class="pred-slot ${sCls[index]}">
-        <div class="pred-rank">${medals[index]} 第${index + 1}位${mark(horseNo)}</div>
-        <div class="pred-horse">${horseNo} · ${horseName}</div>
-        <div class="pred-bar-wrap">
-          <div class="pred-bar-bg"><div class="pred-bar" style="width:${Math.min(100, Math.max(0, probability))}%"></div></div>
-          <span class="pred-pct">${pct}</span>
-        </div>
-        <div class="pred-reason">${place ? place + ' · ' : ''}${reasonBody}</div>
-        ${actual}
-      </div>`;
-    }).join('');
-    const order = preds4.slice(0, 4).map(item => item.entry ? item.entry.horse_no : '').filter(Boolean).join('-');
-    const insight = preds4.insight ? `<div class="pred-insight">${preds4.insight}</div>` : '';
-    return `<details class="pred-box pred-box-a4 pred-panel" open>
-      <summary class="pred-title">
-        <span class="pred-heading-label">Grok4.7 玄機對弈</span>
-        <span class="pred-order" aria-label="預測第1至第4名">${order}</span>
-      </summary>
-      ${insight}
-      <div class="pred-grid">${slots}</div>
-    </details>`;
-  })();
-  const preds5 = buildPrediction5(race.entries || [], [preds, preds2, preds3, preds4]);
-  const pred5HTML = preds5.length < 2 ? '' : (() => {
-    const mark = item => {
-      if (item.topFourCount === item.modelCount) return `<span class="pred-badge-all">${modelCountText5(item.modelCount)}模共識</span>`;
-      if (item.topFourCount >= 3) return `<span class="pred-badge-common">${modelCountText5(item.topFourCount)}模支持</span>`;
-      if (item.topFourCount === 2) return '<span class="pred-badge-common">雙模支持</span>';
-      if (item.topFourCount === 1) return '<span class="pred-badge-unique">單模入圍</span>';
-      return '<span class="pred-badge-unique">互補排名</span>';
-    };
-    const slots = preds5.slice(0, 4).map((item, index) => {
-      const probability = item.prob * 100;
-      const horseNo = item.entry ? String(item.entry.horse_no) : '';
-      const horseName = item.entry ? stripCode(item.entry.horse_name) : item.horse;
-      const actual = RACECARD.demo && item.entry
-        ? `<div class="pred-actual">${actualRankLabel2(item.entry)}</div>` : '';
-      return `<div class="pred-slot ${sCls[index]}">
-        <div class="pred-rank">${medals[index]} 第${index + 1}位${mark(item)}</div>
-        <div class="pred-horse">${horseNo} · ${horseName}</div>
-        <div class="pred-bar-wrap">
-          <div class="pred-bar-bg"><div class="pred-bar" style="width:${Math.min(100, Math.max(0, probability))}%"></div></div>
-          <span class="pred-pct">${probability.toFixed(1)}%</span>
-        </div>
-        <div class="pred-reason">入位 ${(item.placeProb * 100).toFixed(0)}% · ${item.reasons.join(' · ')}</div>
-        ${actual}
-      </div>`;
-    }).join('');
-    const order = preds5.slice(0, 4).map(item => item.entry ? item.entry.horse_no : '').filter(Boolean).join('-');
-    const insight = preds5.insight ? `<div class="pred-insight">${preds5.insight}</div>` : '';
-    return `<details class="pred-box pred-box-a5 pred-panel" open>
-      <summary class="pred-title">
-        <span class="pred-heading-label">GPT6-Luna 月衡</span>
-        <span class="pred-order" aria-label="預測第1至第4名">${order}</span>
-      </summary>
-      ${insight}
-      <div class="pred-grid">${slots}</div>
-    </details>`;
-  })();
-  const preds6 = buildPrediction6(race.entries || [], [preds, preds2, preds3, preds4, preds5]);
-  const pred6HTML = preds6.length < 2 ? '' : (() => {
-    const mark = item => {
-      const lead = item.contributions
-        .map((value, column) => ({ value, column }))
-        .sort((a, b) => b.value - a.value)[0];
-      return `<span class="pred-badge-common">${lead && lead.value >= 0.05 ? A6.LABELS[lead.column] : '綜合'}</span>`;
-    };
-    const slots = preds6.slice(0, 4).map((item, index) => {
-      const probability = item.prob * 100;
-      const horseNo = item.entry ? String(item.entry.horse_no) : '';
-      const horseName = item.entry ? stripCode(item.entry.horse_name) : item.horse;
-      const actual = RACECARD.demo && item.entry
-        ? `<div class="pred-actual">${actualRankLabel2(item.entry)}</div>` : '';
-      return `<div class="pred-slot ${sCls[index]}">
-        <div class="pred-rank">${medals[index]} 第${index + 1}位${mark(item)}</div>
-        <div class="pred-horse">${horseNo} · ${horseName}</div>
-        <div class="pred-bar-wrap">
-          <div class="pred-bar-bg"><div class="pred-bar" style="width:${Math.min(100, Math.max(0, probability))}%"></div></div>
-          <span class="pred-pct">${probability.toFixed(1)}%</span>
-        </div>
-        <div class="pred-reason">入位 ${(item.placeProb * 100).toFixed(0)}% · ${item.reasons.join(' · ')}</div>
-        ${actual}
-      </div>`;
-    }).join('');
-    const order = preds6.slice(0, 4).map(item => item.entry ? item.entry.horse_no : '').filter(Boolean).join('-');
-    const insight = preds6.insight ? `<div class="pred-insight">${preds6.insight}</div>` : '';
-    return `<details class="pred-box pred-box-a6 pred-panel" open>
-      <summary class="pred-title">
-        <span class="pred-heading-label">Deepseek Flash4.1 萃衡</span>
-        <span class="pred-order" aria-label="預測第1至第4名">${order}</span>
-      </summary>
-      ${insight}
-      <div class="pred-grid">${slots}</div>
-    </details>`;
-  })();
-  let preds7 = [];
-  try {
-    preds7 = buildPrediction7(race.entries || [], race) || [];
-  } catch (e) {
-    console.warn('算法7預測失敗', e);
-    preds7 = [];
-  }
-  const pred7HTML = preds7.length < 2 ? '' : (() => {
+  const glmHTML = glmPreds.length < 2 ? '' : (() => {
     const mark = item => {
       const lead = item.contributions.map((value, c) => ({ value, c })).sort((a, b) => b.value - a.value)[0];
-      return `<span class="pred-badge-common">${lead && lead.value >= 0.08 ? A7.LABELS[lead.c] : '綜合'}</span>`;
+      return `<span class="pred-glm-badge">${lead && lead.value >= 0.05 ? GLM.LABELS[lead.c] : '綜合'}</span>`;
     };
-    const slots = preds7.slice(0, 4).map((item, index) => {
+    const slots = glmPreds.slice(0, 4).map((item, index) => {
       const probability = item.prob * 100;
       const horseNo = item.entry ? String(item.entry.horse_no) : '';
       const horseName = item.entry ? stripCode(item.entry.horse_name) : item.horse;
@@ -2961,18 +1640,17 @@ function renderDetail() {
         ${actual}
       </div>`;
     }).join('');
-    const order = preds7.slice(0, 4).map(item => item.entry ? item.entry.horse_no : '').filter(Boolean).join('-');
-    const insight = preds7.insight ? `<div class="pred-insight">${preds7.insight}</div>` : '';
-    return `<details class="pred-box pred-box-a7 pred-panel" open>
+    const order = glmPreds.slice(0, 4).map(item => item.entry ? item.entry.horse_no : '').filter(Boolean).join('-');
+    const insight = glmPreds.insight ? `<div class="pred-insight">${glmPreds.insight}</div>` : '';
+    return `<details class="pred-box pred-box-glm pred-panel" open>
       <summary class="pred-title">
-        <span class="pred-heading-label">GLM 5.3 Flash 格物致知</span>
+        <span class="pred-heading-label">GLM 5.3 洞燭先機</span>
         <span class="pred-order" aria-label="預測第1至第4名">${order}</span>
       </summary>
       ${insight}
       <div class="pred-grid">${slots}</div>
     </details>`;
   })();
-
   $detailContent.innerHTML = `
     <div class="detail-hdr">
       <div class="detail-label">${detailLabel}</div>
@@ -2980,6 +1658,7 @@ function renderDetail() {
       <div class="detail-meta">場地狀況：${race.going || '—'}</div>
     </div>
     ${predHTML}
+    ${glmHTML}
     <div class="card-legend">
       <div class="cl-left">馬名 / 騎師 / 練馬師</div>
       <div class="cl-gw">檔 / 磅</div>
@@ -3050,24 +1729,11 @@ async function loadData() {
       RACECARD = normalizeRacecardData(racecard);
     }
     try {
-      buildIndexes2();
+      buildGlmIndexes();
     } catch (e) {
-      console.warn('算法2索引建立失敗，算法1不受影響', e);
-      IDX2 = null;
+      console.warn('GLM 5.3 洞燭先機索引建立失敗，該預測不可用', e);
+      GLM_IDX = null;
     }
-    try {
-      buildIndexes3();
-    } catch (e) {
-      console.warn('算法3索引建立失敗，其他算法不受影響', e);
-      IDX3 = null;
-    }
-    try {
-      buildIndexes4();
-    } catch (e) {
-      console.warn('算法4索引建立失敗，其他算法不受影響', e);
-      IDX4 = null;
-    }
-
     if (!RACECARD.races || !RACECARD.races.length) {
       showFullstate('📅', '暫未有可用本地賽事卡', '如馬會已發佈下一賽日資料，請稍後重試。', false);
       $hdrDate.textContent = '無賽事';
