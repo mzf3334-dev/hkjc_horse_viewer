@@ -2739,7 +2739,7 @@ function renderDetail() {
     const order = preds.slice(0, 4).map(p => p.entry ? p.entry.horse_no : '').filter(Boolean).join('-');
     return `<details class="pred-box pred-panel" open>
       <summary class="pred-title">
-        <span class="pred-heading-label">Default 加權評分</span>
+        <span class="pred-heading-label">加權評分</span>
         <span class="pred-order" aria-label="預測第1至第4名">${order}</span>
       </summary>
       <div class="pred-grid">${slots}</div>
@@ -2980,12 +2980,6 @@ function renderDetail() {
       <div class="detail-meta">場地狀況：${race.going || '—'}</div>
     </div>
     ${predHTML}
-    ${pred2HTML}
-    ${pred3HTML}
-    ${pred4HTML}
-    ${pred5HTML}
-    ${pred6HTML}
-    ${pred7HTML}
     <div class="card-legend">
       <div class="cl-left">馬名 / 騎師 / 練馬師</div>
       <div class="cl-gw">檔 / 磅</div>
