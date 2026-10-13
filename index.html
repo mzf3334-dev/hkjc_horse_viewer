@@ -176,6 +176,14 @@
       margin-bottom: 4px;
     }
     .detail-meta { font-size: 13px; color: var(--t2); }
+    .going-live {
+      display: inline-block;
+      font-size: 10px; font-weight: 700;
+      color: #14532D; background: #DCFCE7;
+      border: 1px solid #BBF7D0;
+      border-radius: 10px; padding: 1px 7px;
+      vertical-align: 1px;
+    }
 
     /* Card legend row */
     .card-legend {
@@ -514,6 +522,121 @@
 
 /* ── Config ──────────────────────────────────────── */
 const SCRAPER_RAW = 'https://raw.githubusercontent.com/mzf3334-dev/hkjc_scraper/main';
+
+/* ── Windtracker 當日場地 ────────────────────────── */
+/* 數據與 https://racing.hkjc.com/zh-hk/local/info/windtracker（天氣及跑道狀況）
+   同源：該頁面以 info.cld.hkjc.com 的 wt_WeatherMeeting GraphQL 取得各場
+   go_ch／go_en（好地、軟地、黏地、封地等），此處直接查詢同一 API（允許跨域）。 */
+const WINDTRACKER_QIDS = 'https://info.cld.hkjc.com/graphql/base/';
+const WINDTRACKER_TTL_MS     = 10 * 60 * 1000;  // 10 分鐘快取，避免重複轟炸馬會 API
+const WINDTRACKER_TIMEOUT_MS = 8000;            // 超時即放棄，按原有預測結果顯示
+const WINDTRACKER_QUERY = `
+query wt_WeatherMeeting( $localSim: LocalSim, $status: [MeetingStatus!])  {
+  commonMeetings(localSim: $localSim, status: $status) {
+    date
+    venueCode
+    meetingTrack_en
+    meetingTrack_ch
+    status
+    totalNumberOfRace
+    currentNumberOfRace
+    meetingType
+    penetrometerReadings {
+      reading
+      readingTime
+      sequenceNumber
+    }
+    hammerReadings {
+      sequenceNumber
+      readingTime
+      reading
+    }
+    course {
+      code
+      chinese
+      english
+      mandarin
+    }
+    races {
+      go_en
+      go_ch
+      status
+      no
+      raceTrack {
+        code
+      }
+    }
+  }
+}`;
+
+async function fetchWindtrackerMeetings() {
+  const cacheKey = 'windtracker-meetings';
+  try {
+    const cached = JSON.parse(sessionStorage.getItem(cacheKey) || 'null');
+    if (cached && cached.at && (Date.now() - cached.at) < WINDTRACKER_TTL_MS && Array.isArray(cached.meetings)) {
+      return cached.meetings;
+    }
+  } catch (e) { /* 忽略快取錯誤 */ }
+
+  const ctrl  = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), WINDTRACKER_TIMEOUT_MS);
+  let meetings;
+  try {
+    const res = await fetch(WINDTRACKER_QIDS, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: WINDTRACKER_QUERY,
+        variables: {
+          localSim: 'LOCAL',
+          status: ['DECLARED', 'DEFINED', 'STARTED', 'CLOSED', 'ABANDON_PARTIAL', 'ABANDON'],
+        },
+      }),
+      signal: ctrl.signal,
+    });
+    if (!res.ok) throw new Error(`風向及風速儀 API 回應 ${res.status}`);
+    const json = await res.json();
+    if (json.errors && json.errors.length) throw new Error(json.errors[0]?.message || 'GraphQL 查詢失敗');
+    meetings = (json.data && json.data.commonMeetings) || [];
+  } finally {
+    clearTimeout(timer);
+  }
+
+  try { sessionStorage.setItem(cacheKey, JSON.stringify({ at: Date.now(), meetings })); } catch (e) {}
+  return meetings;
+}
+
+/* 由 meeting 清單中取出指定日期＋場地的各場場地狀況（race_no → go_ch） */
+function windtrackerGoingMap(meetings, dateStr, venueCode) {
+  const isoDate = String(dateStr || '').replace(/\//g, '-');
+  const venue   = String(venueCode || '').trim().toUpperCase();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(isoDate) || !venue) return null;
+  const meeting = (meetings || []).find(m => String(m.date || '') === isoDate
+    && String(m.venueCode || '').toUpperCase() === venue);
+  if (!meeting || !Array.isArray(meeting.races)) return null;
+  const map = {};
+  for (const r of meeting.races) {
+    const going = String(r.go_ch || '').trim();
+    const no    = String(r.no ?? '').trim();
+    if (going && no) map[no] = going;   // 每場獨立場地（草地／全天候可不同）
+  }
+  return Object.keys(map).length ? map : null;
+}
+
+/* 找到當日場地 → 套用至賽事卡並重新計算預測；找不到 → 沿用原有預測結果 */
+function applyWindtrackerGoing(goingMap) {
+  if (!goingMap || !RACECARD || !RACECARD.races) return 0;
+  let applied = 0;
+  for (const race of RACECARD.races) {
+    const going = goingMap[String(race.race_no)];
+    if (going) {
+      race.going     = going;
+      race.goingLive = true;
+      applied++;
+    }
+  }
+  return applied;
+}
 
 /* ── State ───────────────────────────────────────── */
 let D        = [];       // all historical rows parsed from all_results.csv
@@ -1651,11 +1774,17 @@ function renderDetail() {
       <div class="pred-grid">${slots}</div>
     </details>`;
   })();
+  const goingMeta = race.going
+    ? `場地狀況：${race.going}` +
+      (race.goingLive ? ' <span class="going-live">實時場地 · 預測已重新計算</span>' : '')
+    : `場地狀況：—` +
+      (RACECARD.goingFetchTried && !RACECARD.goingLiveApplied ? '（未找到當日場地，預測按原有資料計算）' : '');
+
   $detailContent.innerHTML = `
     <div class="detail-hdr">
       <div class="detail-label">${detailLabel}</div>
       <div class="detail-title">第 ${race.race_no} 場 &nbsp;·&nbsp; ${race.distance || ''}</div>
-      <div class="detail-meta">場地狀況：${race.going || '—'}</div>
+      <div class="detail-meta">${goingMeta}</div>
     </div>
     ${predHTML}
     ${glmHTML}
@@ -1709,6 +1838,13 @@ async function loadData() {
     const historyUrl = localHistory
       ? '../hkjc_scraper/data/all_results.csv'
       : `${SCRAPER_RAW}/data/all_results.csv`;
+    // 當日場地（風向及風速儀）與賽事卡／賽果並行下載；失敗不影響原有預測
+    const goingPromise = demoMode
+      ? Promise.resolve(null)
+      : fetchWindtrackerMeetings().catch(e => {
+          console.warn('當日場地（風向及風速儀）取得失敗，按原有預測結果顯示。', e);
+          return null;
+        });
     const [racecard, csvText] = await Promise.all([
       demoMode ? Promise.resolve(null) : fetch(`${SCRAPER_RAW}/data/racecard_today.json`).then(r => {
         if (!r.ok) throw new Error(`racecard_today.json 下載失敗 (${r.status})`);
@@ -1738,6 +1874,20 @@ async function loadData() {
       showFullstate('📅', '暫未有可用本地賽事卡', '如馬會已發佈下一賽日資料，請稍後重試。', false);
       $hdrDate.textContent = '無賽事';
       return;
+    }
+
+    /* ── 當日場地：首次載入時向風向及風速儀查詢 ──
+       找到（好地／軟地／黏地等）→ 套用至各場並重新計算預測；
+       找不到 → 保持原狀，沿用原有已計算好的預測結果。 */
+    if (!demoMode) {
+      const meetings = await goingPromise;
+      const goingMap = meetings && windtrackerGoingMap(meetings, RACECARD.date, RACECARD.venue);
+      RACECARD.goingFetchTried  = true;
+      const applied = goingMap ? applyWindtrackerGoing(goingMap) : 0;
+      RACECARD.goingLiveApplied = applied > 0;
+      console.info(applied
+        ? `當日場地已套用至 ${applied} 場，預測已按當日場地重新計算。`
+        : '未找到當日場地，預測按原有資料計算。');
     }
 
     // Init UI
