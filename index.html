@@ -46,6 +46,28 @@
       padding: 3px 10px; border-radius: 12px;
     }
 
+    /* ── Backtest chart ── */
+    .bt-btn { margin-left: auto; background: rgba(255,255,255,.2); color: #fff; border: 1px solid rgba(255,255,255,.4);
+      border-radius: 14px; padding: 5px 12px; font-size: 12px; cursor: pointer; }
+    .bt-btn:hover { background: rgba(255,255,255,.32); }
+    .bt-modal { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 12px; }
+    .bt-panel { background: #fff; color: #222; border-radius: 10px; width: 640px; max-width: 100%; padding: 16px; }
+    .bt-head { display: flex; justify-content: space-between; align-items: center; font-weight: 700; margin-bottom: 12px; }
+    .bt-head button { border: 0; background: none; font-size: 18px; cursor: pointer; }
+    .bt-chart { display: flex; gap: 14px; height: 260px; align-items: stretch; padding-top: 18px; }
+    .bt-group { flex: 1; display: flex; flex-direction: column; }
+    .bt-bars { flex: 1; display: flex; gap: 6px; align-items: flex-end; justify-content: center; }
+    .bt-bar-wrap { width: 36%; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+    .bt-chart.single .bt-bar-wrap { width: 90px; }
+    .bt-bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 2px; }
+    .bt-val { font-size: 11px; margin-bottom: 2px; }
+    .bt-label { text-align: center; font-size: 12px; margin-top: 6px; }
+    .bt-legend { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-top: 12px; font-size: 12px; }
+    .bt-leg i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; }
+    .bt-sub { font-weight: 700; font-size: 13px; margin: 16px 0 0; text-align: center; }
+    .bt-panel { max-height: 94vh; overflow-y: auto; }
+    .bt-note { font-size: 11px; color: #666; margin-top: 10px; text-align: center; }
+
     /* ── Loading overlay ── */
     .loading-overlay {
       position: fixed; inset: 0;
@@ -483,7 +505,14 @@
     <div class="hdr-sub">下場預測 · 馬匹分析工具</div>
   </div>
   <span class="hdr-race-day" id="hdrDate">—</span>
+  <button class="bt-btn" id="btOpen" onclick="openBacktest()">📊 模型勝率比較</button>
 </header>
+<div class="bt-modal hidden" id="btModal" onclick="if(event.target===this)closeBacktest()">
+  <div class="bt-panel">
+    <div class="bt-head"><span>預測模型勝率比較（第1–第4名）</span><button onclick="closeBacktest()">✕</button></div>
+    <div id="btBody"></div>
+  </div>
+</div>
 
 <!-- ── Full-page state (no race / error) ──────────── -->
 <div class="fullstate hidden" id="fullstate">
@@ -688,7 +717,7 @@ function normalizeRacecardData(rawRacecard) {
   };
 }
 
-function buildPreviousRaceDemo(rows) {
+function rebuildHistoricalRaces(rows) {
   const nonFinishers = new Set(['PU', 'DNF', 'UR', 'FE']);
   const races = new Map();
   for (const row of rows) {
@@ -703,12 +732,10 @@ function buildPreviousRaceDemo(rows) {
     races.get(key).rows.push(row);
   }
 
-  const latestDate = [...races.values()].map(race => race.date).sort().at(-1);
-  if (!latestDate) throw new Error('歷史賽果中找不到可預覽的已完成賽事。');
-  const demoRaces = [...races.values()]
-    .filter(race => race.date === latestDate)
-    .sort((a, b) => a.raceNo - b.raceNo)
+  return [...races.values()]
+    .sort((a, b) => a.date.localeCompare(b.date) || a.raceNo - b.raceNo)
     .map(race => ({
+      date: race.date,
       race_no: String(race.raceNo),
       distance: String(race.rows[0][2] || '').trim(),
       going: String(race.rows[0][3] || '').trim(),
@@ -730,6 +757,14 @@ function buildPreviousRaceDemo(rows) {
       }).filter(isValidRaceEntry),
     }))
     .filter(race => race.entries.length >= 2);
+}
+
+function buildPreviousRaceDemo(rows) {
+  const all = rebuildHistoricalRaces(rows);
+  const latestDate = all.length ? all[all.length - 1].date : '';
+  if (!latestDate) throw new Error('歷史賽果中找不到可預覽的已完成賽事。');
+  const demoRaces = all.filter(race => race.date === latestDate)
+    .map(({ date, ...race }) => race);
   if (!demoRaces.length) throw new Error('最近賽馬日沒有足夠有效排位可供預覽。');
 
   return {
@@ -1595,6 +1630,110 @@ function buildGlmPrediction(entries, race) {
   return scored;
 }
 /* ═══ GLM 5.3 洞燭先機 — model core end ═══ */
+
+/* ── Backtest chart: 舊預測 vs GLM 5.3 洞燭先機 ── */
+const BACKTEST_RACES = 150;
+let backtestResult = null;
+let backtestRunning = false;
+
+async function runBacktest(onProgress) {
+  const all = rebuildHistoricalRaces(D);
+  const sample = all.slice(-BACKTEST_RACES);
+  const models = { basic: [0, 0, 0, 0], glm: [0, 0, 0, 0] };
+  const top4 = { basic: [0, 0, 0, 0], glm: [0, 0, 0, 0] };
+  const counted = { basic: 0, glm: 0 };
+  const fullD = D, fullRacecard = RACECARD;
+  const tally = (key, ranked) => {
+    if (ranked.length < 4) return;
+    counted[key]++;
+    for (let k = 0; k < 4; k++) {
+      const actual = parseInt(ranked[k].entry.actual_rank, 10);
+      if (actual === 1) models[key][k]++;
+      if (actual >= 1 && actual <= 4) top4[key][k]++;
+    }
+  };
+  const priorCache = new Map();
+  try {
+    for (let i = 0; i < sample.length; i++) {
+      const race = sample[i];
+      if (!race.entries.some(e => parseInt(e.actual_rank, 10) === 1)) continue;
+      // Both models may only see results from before the race date.
+      if (!priorCache.has(race.date)) priorCache.set(race.date, fullD.filter(r => String(r[0] || '').trim() < race.date));
+      D = priorCache.get(race.date);
+      RACECARD = { date: race.date, races: [] };
+      try { tally('basic', buildPrediction(race.entries, race.distance)); } catch (e) { console.warn(e); }
+      if (GLM_IDX) {
+        try { tally('glm', buildGlmPrediction(race.entries, race)); } catch (e) { console.warn(e); }
+      }
+      if (i % 5 === 4) {
+        D = fullD; RACECARD = fullRacecard;
+        onProgress(i + 1, sample.length);
+        await new Promise(r => setTimeout(r, 0));
+      }
+    }
+  } finally {
+    D = fullD; RACECARD = fullRacecard;
+  }
+  return { models, top4, counted, total: sample.length,
+           from: sample.length ? sample[0].date : '', to: sample.length ? sample[sample.length - 1].date : '' };
+}
+
+function renderBacktestChart(res) {
+  const overall = { basic: [0], glm: [0] };
+  for (const key of Object.keys(overall)) {
+    overall[key][0] = res.top4[key].reduce((a, b) => a + b, 0) / 4;
+  }
+  return renderBarChart(res, res.models, '勝率 = 模型預測排第 N 位的馬匹實際跑第 1 名的比率。')
+    + '<div class="bt-sub">頭四名勝率（預測頭四名中，實際跑入頭四名的比率）</div>'
+    + renderBarChart(res, overall, '頭四名勝率 = 模型預測的四匹馬中，實際跑入第 1–4 名的平均比率。', true, ['預測頭四名']);
+}
+
+function renderBarChart(res, data, note, noRange, labels) {
+  const defs = [
+    { key: 'basic', name: '基本預測模型', color: '#1a73e8' },
+    { key: 'glm', name: 'GLM 5.3 洞燭先機', color: '#e8710a' },
+  ].filter(m => res.counted[m.key] > 0);
+  if (!defs.length) return '<div class="bt-note">沒有足夠歷史賽事資料可供比較。</div>';
+  const pct = (m, k) => data[m.key][k] / res.counted[m.key] * 100;
+  const max = Math.max(10, Math.ceil(Math.max(...defs.flatMap(m => data[m.key].map((_, k) => pct(m, k)))) / 10) * 10);
+  let groups = '';
+  for (let k = 0; k < data.basic.length; k++) {
+    const bars = defs.map(m => {
+      const v = pct(m, k);
+      return `<div class="bt-bar-wrap" title="${m.name}：${labels ? labels[k] : `預測第${k + 1}名`} ${labels ? Math.round(data[m.key][k] * 4) + '/' + (res.counted[m.key] * 4) + ' 匹' : data[m.key][k] + '/' + res.counted[m.key] + ' 場'}">
+        <div class="bt-val">${v.toFixed(1)}%</div>
+        <div class="bt-bar" style="height:${(v / max * 100).toFixed(1)}%;background:${m.color}"></div></div>`;
+    }).join('');
+    groups += `<div class="bt-group"><div class="bt-bars">${bars}</div><div class="bt-label">${labels ? labels[k] : `預測第${k + 1}名`}</div></div>`;
+  }
+  const legend = defs.map(m => `<span class="bt-leg"><i style="background:${m.color}"></i>${m.name}（${res.counted[m.key]} 場）</span>`).join('');
+  return `<div class="bt-chart${labels ? ' single' : ''}">${groups}</div>
+    <div class="bt-legend">${legend}</div>
+    <div class="bt-note">${note}${noRange ? '' : `以 ${res.from} 至 ${res.to} 最近 ${res.total} 場現有賽果走步回測，每場只用賽前資料。`}</div>`;
+}
+
+async function openBacktest() {
+  const modal = document.getElementById('btModal');
+  const body = document.getElementById('btBody');
+  modal.classList.remove('hidden');
+  if (backtestResult) { body.innerHTML = renderBacktestChart(backtestResult); return; }
+  if (backtestRunning) return;
+  backtestRunning = true;
+  body.innerHTML = '<div class="bt-note" id="btProg">計算中…</div>';
+  try {
+    backtestResult = await runBacktest((n, t) => {
+      const el = document.getElementById('btProg');
+      if (el) el.textContent = `計算中… ${n}/${t}`;
+    });
+    body.innerHTML = renderBacktestChart(backtestResult);
+  } catch (e) {
+    console.error(e);
+    body.innerHTML = '<div class="bt-note">回測失敗：' + String(e.message || e).replace(/[<>&]/g, '') + '</div>';
+  } finally {
+    backtestRunning = false;
+  }
+}
+function closeBacktest() { document.getElementById('btModal').classList.add('hidden'); }
 
 /* ── Render race strip (mobile) ─────────────────── */
 function renderRaceStrip() {
