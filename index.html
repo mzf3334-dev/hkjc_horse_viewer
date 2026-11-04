@@ -47,7 +47,7 @@
     }
 
     /* ── Backtest chart ── */
-    .bt-btn { margin-left: auto; background: rgba(255,255,255,.2); color: #fff; border: 1px solid rgba(255,255,255,.4);
+    .bt-btn { background: rgba(255,255,255,.2); color: #fff; border: 1px solid rgba(255,255,255,.4);
       border-radius: 14px; padding: 5px 12px; font-size: 12px; cursor: pointer; }
     .bt-btn:hover { background: rgba(255,255,255,.32); }
     .bt-modal { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 12px; }
@@ -505,8 +505,19 @@
     <div class="hdr-sub">下場預測 · 馬匹分析工具</div>
   </div>
   <span class="hdr-race-day" id="hdrDate">—</span>
-  <button class="bt-btn" id="btOpen" onclick="openBacktest()">📊 模型勝率比較</button>
+  <button class="bt-btn" id="treasureOpen" style="margin-left:auto" onclick="openTreasure()">💎 尋寶</button>
+  <button class="bt-btn" style="margin-left:8px" id="btOpen" onclick="openBacktest()">📊 模型勝率比較</button>
 </header>
+<div class="bt-modal hidden" id="trModal" onclick="if(event.target===this)closeTreasure()">
+  <div class="bt-panel">
+    <div class="bt-head"><span>尋寶：騎師曾策騎入前4名的今日馬匹</span><button onclick="closeTreasure()">✕</button></div>
+    <form onsubmit="searchTreasure(event)" style="display:flex;gap:8px;margin-bottom:12px">
+      <input id="trJockey" placeholder="輸入騎師中文名，例如：潘頓" autocomplete="off" style="flex:1;padding:6px 8px;border:1px solid #ccc;border-radius:6px;font-size:14px">
+      <button type="submit" class="bt-btn" style="margin:0;background:#1a5fb4;border-color:#1a5fb4">搜尋</button>
+    </form>
+    <div id="trBody" style="max-height:60vh;overflow:auto"></div>
+  </div>
+</div>
 <div class="bt-modal hidden" id="btModal" onclick="if(event.target===this)closeBacktest()">
   <div class="bt-panel">
     <div class="bt-head"><span>預測模型勝率比較（第1–第4名）</span><button onclick="closeBacktest()">✕</button></div>
@@ -1734,6 +1745,39 @@ async function openBacktest() {
   }
 }
 function closeBacktest() { document.getElementById('btModal').classList.add('hidden'); }
+
+/* ── 尋寶：騎師曾策騎入前4名的今日馬匹 ── */
+function openTreasure() {
+  document.getElementById('trModal').classList.remove('hidden');
+  document.getElementById('trJockey').focus();
+}
+function closeTreasure() { document.getElementById('trModal').classList.add('hidden'); }
+function searchTreasure(ev) {
+  if (ev) ev.preventDefault();
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const body = document.getElementById('trBody');
+  const name = document.getElementById('trJockey').value.trim();
+  if (!name) { body.innerHTML = '<div class="bt-note">請輸入騎師中文名。</div>'; return; }
+  if (!RACECARD || !RACECARD.races) { body.innerHTML = '<div class="bt-note">賽事資料尚未載入。</div>'; return; }
+  const riderOf = r => String(r[7] || '').replace(/[（(][^）)]*[）)]/g, '').trim();
+  const rows = [];
+  for (const race of RACECARD.races) {
+    for (const e of race.entries || []) {
+      const horse = stripCode(e.horse_name);
+      const best = D.filter(r => stripCode(r[6]) === horse && riderOf(r) === name)
+        .map(r => parseInt(r[4], 10)).filter(p => p >= 1 && p <= 4);
+      if (!best.length) continue;
+      rows.push({ race: race.race_no, horse, dist: race.distance, venue: RACECARD.venue || race.venue || '—',
+        going: race.going || '—', best: Math.min(...best), n: best.length });
+    }
+  }
+  if (!rows.length) { body.innerHTML = `<div class="bt-note">在已下載數據中找不到「${esc(name)}」曾策騎入前4名的今日馬匹。</div>`; return; }
+  const td = 'style="padding:5px 8px;border-bottom:1px solid #eee"';
+  body.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="text-align:left">'
+    + ['場次', '馬匹', '路程', '馬場', '場地', '最佳名次/次數'].map(h => `<th ${td}>${h}</th>`).join('') + '</tr>'
+    + rows.map(r => `<tr><td ${td}>第${esc(r.race)}場</td><td ${td}>${esc(r.horse)}</td><td ${td}>${esc(r.dist)}${/\d$/.test(String(r.dist)) ? 'm' : ''}</td><td ${td}>${esc(r.venue)}</td><td ${td}>${esc(r.going)}</td><td ${td}>第${r.best}名 / ${r.n}次</td></tr>`).join('')
+    + '</table>';
+}
 
 /* ── Render race strip (mobile) ─────────────────── */
 function renderRaceStrip() {
