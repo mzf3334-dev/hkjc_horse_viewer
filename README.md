@@ -6,6 +6,7 @@ A lightweight browser app for exploring Hong Kong horse race cards and historica
 
 - Browse the current race card and inspect each runner's jockey, trainer, draw, weight, recent form, and running position.
 - Compare two top-four prediction panels: a simple weighted-score baseline and GLM 5.3 Insight.
+- Search the current race card for horses previously ridden by a named jockey, regardless of finishing position.
 - View estimated win and top-three probabilities, the predicted top-four order, and the strongest contributing factors.
 - Use the responsive interface on desktop or mobile.
 

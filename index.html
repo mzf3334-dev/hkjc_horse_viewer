@@ -510,7 +510,7 @@
 </header>
 <div class="bt-modal hidden" id="trModal" onclick="if(event.target===this)closeTreasure()">
   <div class="bt-panel">
-    <div class="bt-head"><span>尋寶：騎師曾策騎入前7名的今日馬匹</span><button onclick="closeTreasure()">✕</button></div>
+    <div class="bt-head"><span>尋寶：騎師曾策騎的本賽日馬匹</span><button onclick="closeTreasure()">✕</button></div>
     <form onsubmit="searchTreasure(event)" style="display:flex;gap:8px;margin-bottom:12px">
       <input id="trJockey" placeholder="輸入騎師中文名，例如：潘頓" autocomplete="off" style="flex:1;padding:6px 8px;border:1px solid #ccc;border-radius:6px;font-size:14px">
       <button type="submit" class="bt-btn" style="margin:0;background:#1a5fb4;border-color:#1a5fb4">搜尋</button>
@@ -1746,8 +1746,31 @@ async function openBacktest() {
 }
 function closeBacktest() { document.getElementById('btModal').classList.add('hidden'); }
 
-/* ── 尋寶：騎師曾策騎入前7名的今日馬匹 ── */
-const TREASURE_TOP = 7;
+/* ── 尋寶：騎師曾策騎的本賽日馬匹 ── */
+function findTreasureRides(history, racecard, name) {
+  const raceDate = glmEpoch(String(racecard.date || '').trim().replace(/-/g, '/'));
+  if (!Number.isFinite(raceDate)) throw new Error('賽事日期無效，無法搜尋之前的策騎紀錄。');
+  const rides = new Map();
+  for (const row of history) {
+    const date = glmEpoch(String(row[0] || '').trim().replace(/-/g, '/'));
+    const jockey = String(row[7] || '').replace(/[（(][^）)]*[）)]/g, '').trim();
+    const rank = glmParseRank(row[4]);
+    if (!Number.isFinite(date) || date >= raceDate || jockey !== name || (rank && rank.kind === 'scratch')) continue;
+    const horse = stripCode(row[6]);
+    rides.set(horse, (rides.get(horse) || 0) + 1);
+  }
+  const results = [];
+  for (const race of racecard.races) {
+    for (const entry of race.entries || []) {
+      const horse = stripCode(entry.horse_name);
+      const count = rides.get(horse);
+      if (count) results.push({ race: race.race_no, horse, dist: race.distance,
+        venue: race.venue || racecard.venue || '—', going: race.going || '—', count });
+    }
+  }
+  return results;
+}
+
 function openTreasure() {
   document.getElementById('trModal').classList.remove('hidden');
   document.getElementById('trJockey').focus();
@@ -1760,23 +1783,19 @@ function searchTreasure(ev) {
   const name = document.getElementById('trJockey').value.trim();
   if (!name) { body.innerHTML = '<div class="bt-note">請輸入騎師中文名。</div>'; return; }
   if (!RACECARD || !RACECARD.races) { body.innerHTML = '<div class="bt-note">賽事資料尚未載入。</div>'; return; }
-  const riderOf = r => String(r[7] || '').replace(/[（(][^）)]*[）)]/g, '').trim();
-  const rows = [];
-  for (const race of RACECARD.races) {
-    for (const e of race.entries || []) {
-      const horse = stripCode(e.horse_name);
-      const mine = D.filter(r => stripCode(r[6]) === horse && riderOf(r) === name)
-        .map(r => parseInt(r[4], 10)).filter(p => p >= 1 && p <= TREASURE_TOP);
-      if (!mine.length) continue;
-      rows.push({ race: race.race_no, horse, dist: race.distance, venue: RACECARD.venue || race.venue || '—',
-        going: race.going || '—', src: `最佳第${Math.min(...mine)}名 · ${mine.length}次` });
-    }
+  let rows;
+  try {
+    rows = findTreasureRides(D, RACECARD, name);
+  } catch (e) {
+    console.error(e);
+    body.textContent = e.message;
+    return;
   }
-  if (!rows.length) { body.innerHTML = `<div class="bt-note">在已下載數據中找不到「${esc(name)}」曾策騎入前${TREASURE_TOP}名的今日馬匹。</div>`; return; }
+  if (!rows.length) { body.innerHTML = `<div class="bt-note">在已下載數據中找不到「${esc(name)}」曾策騎的本賽日馬匹。</div>`; return; }
   const td = 'style="padding:5px 8px;border-bottom:1px solid #eee"';
   body.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="text-align:left">'
-    + ['場次', '馬匹', '路程', '馬場', '場地', `入前${TREASURE_TOP}紀錄`].map(h => `<th ${td}>${h}</th>`).join('') + '</tr>'
-    + rows.map(r => `<tr><td ${td}>第${esc(r.race)}場</td><td ${td}>${esc(r.horse)}</td><td ${td}>${esc(r.dist)}${/\d$/.test(String(r.dist)) ? 'm' : ''}</td><td ${td}>${esc(r.venue)}</td><td ${td}>${esc(r.going)}</td><td ${td}>${esc(r.src)}</td></tr>`).join('')
+    + ['場次', '馬匹', '路程', '馬場', '場地', '過往策騎次數'].map(h => `<th ${td}>${h}</th>`).join('') + '</tr>'
+    + rows.map(r => `<tr><td ${td}>第${esc(r.race)}場</td><td ${td}>${esc(r.horse)}</td><td ${td}>${esc(r.dist)}${/\d$/.test(String(r.dist)) ? 'm' : ''}</td><td ${td}>${esc(r.venue)}</td><td ${td}>${esc(r.going)}</td><td ${td}>${r.count}次</td></tr>`).join('')
     + '</table>';
 }
 
