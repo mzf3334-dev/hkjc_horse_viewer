@@ -510,7 +510,7 @@
 </header>
 <div class="bt-modal hidden" id="trModal" onclick="if(event.target===this)closeTreasure()">
   <div class="bt-panel">
-    <div class="bt-head"><span>尋寶：騎師今日策騎、曾跑入前4名的馬匹</span><button onclick="closeTreasure()">✕</button></div>
+    <div class="bt-head"><span>尋寶：騎師曾策騎入前4名／今日策騎的馬匹</span><button onclick="closeTreasure()">✕</button></div>
     <form onsubmit="searchTreasure(event)" style="display:flex;gap:8px;margin-bottom:12px">
       <input id="trJockey" placeholder="輸入騎師中文名，例如：潘頓" autocomplete="off" style="flex:1;padding:6px 8px;border:1px solid #ccc;border-radius:6px;font-size:14px">
       <button type="submit" class="bt-btn" style="margin:0;background:#1a5fb4;border-color:#1a5fb4">搜尋</button>
@@ -1746,7 +1746,7 @@ async function openBacktest() {
 }
 function closeBacktest() { document.getElementById('btModal').classList.add('hidden'); }
 
-/* ── 尋寶：騎師今日策騎、曾跑入前4名的馬匹 ── */
+/* ── 尋寶：騎師曾策騎入前4名／今日策騎的馬匹 ── */
 function openTreasure() {
   document.getElementById('trModal').classList.remove('hidden');
   document.getElementById('trJockey').focus();
@@ -1763,20 +1763,23 @@ function searchTreasure(ev) {
   const rows = [];
   for (const race of RACECARD.races) {
     for (const e of race.entries || []) {
-      if (riderOf([0, 0, 0, 0, 0, 0, 0, e.jockey]) !== name) continue;
       const horse = stripCode(e.horse_name);
       const runs = D.filter(r => stripCode(r[6]) === horse);
+      const mine = runs.filter(r => riderOf(r[7]) === name).map(r => parseInt(r[4], 10)).filter(p => p >= 1 && p <= 4);
+      const rideToday = riderOf(e.jockey) === name;
       const places = runs.map(r => parseInt(r[4], 10)).filter(p => p >= 1 && p <= 4);
-      if (!places.length) continue;
+      // 曾由該騎師策騎入前4，或該騎師今日策騎且該馬曾入前4
+      if (!mine.length && !(rideToday && places.length)) continue;
+      const src = [mine.length ? `曾騎入前4×${mine.length}` : '', rideToday ? '今日策騎' : ''].filter(Boolean).join(' · ');
       rows.push({ race: race.race_no, horse, dist: race.distance, venue: RACECARD.venue || race.venue || '—',
-        going: race.going || '—', best: Math.min(...places), n: places.length, total: runs.length });
+        going: race.going || '—', src });
     }
   }
-  if (!rows.length) { body.innerHTML = `<div class="bt-note">在已下載數據中找不到「${esc(name)}」今日策騎、且曾跑入前4名的馬匹。</div>`; return; }
+  if (!rows.length) { body.innerHTML = `<div class="bt-note">在已下載數據中找不到與「${esc(name)}」相關的今日馬匹。</div>`; return; }
   const td = 'style="padding:5px 8px;border-bottom:1px solid #eee"';
   body.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="text-align:left">'
-    + ['場次', '馬匹', '路程', '馬場', '場地', '歷史入前4'].map(h => `<th ${td}>${h}</th>`).join('') + '</tr>'
-    + rows.map(r => `<tr><td ${td}>第${esc(r.race)}場</td><td ${td}>${esc(r.horse)}</td><td ${td}>${esc(r.dist)}${/\d$/.test(String(r.dist)) ? 'm' : ''}</td><td ${td}>${esc(r.venue)}</td><td ${td}>${esc(r.going)}</td><td ${td}>第${r.best}名 · 入前4 ${r.n}/${r.total}仗</td></tr>`).join('')
+    + ['場次', '馬匹', '路程', '馬場', '場地', '原因'].map(h => `<th ${td}>${h}</th>`).join('') + '</tr>'
+    + rows.map(r => `<tr><td ${td}>第${esc(r.race)}場</td><td ${td}>${esc(r.horse)}</td><td ${td}>${esc(r.dist)}${/\d$/.test(String(r.dist)) ? 'm' : ''}</td><td ${td}>${esc(r.venue)}</td><td ${td}>${esc(r.going)}</td><td ${td}>${esc(r.src)}</td></tr>`).join('')
     + '</table>';
 }
 
